@@ -1,0 +1,21 @@
+{# display in view forum #}
+{% if topicrow.TOPIC_IMAGES %}
+	{% set preview = topicrow %}
+{% endif %}
+
+{# display in search results #}
+{% if searchresults.TOPIC_IMAGES %}
+	{% set preview = searchresults %}
+{% endif %}
+
+{# display in Similar Topics extension #}
+{% if similar.TOPIC_IMAGES %}
+	{% set preview = similar %}
+{% endif %}
+
+{# display in Recent Topics extension #}
+{% if recent_topics.TOPIC_IMAGES %}
+	{% set preview = recent_topics %}
+{% endif %}
+
+<div {% if preview.TOPIC_IMAGES %}class="topic-image-preview" data-ot="{{ preview.TOPIC_IMAGES }}" data-ot-group="topics" data-ot-background="transparent" data-ot-border-width="0" data-ot-border-radius="0"{% endif %}>

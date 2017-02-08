@@ -1,0 +1,8 @@
+services:
+    vse.TopicImagePreview.listener:
+        class: vse\TopicImagePreview\event\main_listener
+        arguments:
+            - '@config'
+            - '@language'
+        tags:
+            - { name: event.listener }
