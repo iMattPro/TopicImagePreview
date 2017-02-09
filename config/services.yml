@@ -3,6 +3,7 @@ services:
         class: vse\TopicImagePreview\event\main_listener
         arguments:
             - '@config'
+            - '@dbal.conn'
             - '@language'
         tags:
             - { name: event.listener }

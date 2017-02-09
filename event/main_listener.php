@@ -26,6 +26,11 @@ class main_listener implements EventSubscriberInterface
 	protected $config;
 
 	/**
+	 * @var \phpbb\db\driver\driver_interface
+	 */
+	protected $db;
+
+	/**
 	 * @var \phpbb\language\language
 	 */
 	protected $language;
@@ -65,17 +70,19 @@ class main_listener implements EventSubscriberInterface
 	/**
 	 * main_listener constructor.
 	 *
-	 * @param \phpbb\config\config     $config
-	 * @param \phpbb\language\language $language
+	 * @param \phpbb\config\config              $config
+	 * @param \phpbb\db\driver\driver_interface $db
+	 * @param \phpbb\language\language          $language
 	 */
-	public function __construct(\phpbb\config\config $config, \phpbb\language\language $language)
+	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db, \phpbb\language\language $language)
 	{
 		$this->config = $config;
+		$this->db = $db;
 		$this->language = $language;
 	}
 
 	/**
-	 * Modify SQL queries to get the first or last post's text
+	 * Add post text containing images to topic row data.
 	 *
 	 * @param \phpbb\event\data $event The event object
 	 *
@@ -83,33 +90,45 @@ class main_listener implements EventSubscriberInterface
 	 */
 	public function modify_sql($event)
 	{
-		$select = ', p.post_text';
-		$join = [
-			'FROM'	=> [POSTS_TABLE => 'p'],
-			'ON'	=> 'p.post_id = t.' . ($this->config->offsetGet('vse_tip_new') ? 'topic_last_post_id' : 'topic_first_post_id')
-		];
+		// Use topic_list from event, otherwise create one based on the rowset
+		$topic_list = $event->offsetExists('topic_list') ? $event['topic_list'] : array_keys($event['rowset']);
 
-		// Update an sql array
-		if ($event->offsetExists('sql_array'))
+		if (count($topic_list))
 		{
-			$sql_array = $event['sql_array'];
-			$sql_array['SELECT'] .= $select;
-			$sql_array['LEFT_JOIN'][] = $join;
-			$event['sql_array'] = $sql_array;
-			return;
+			$event['rowset'] = $this->query_images($topic_list, $event['rowset']);
 		}
+	}
 
-		// Update an sql select stmt
-		if ($event->offsetExists('sql_select'))
-		{
-			$event['sql_select'] .= $select;
-		}
+	/**
+	 * Run an SQL query to find the posts with images in a topic's rowset.
+	 *
+	 * @param array $topic_list An array of topic ids
+	 * @param array $rowset     The rowset of topic data
+	 *
+	 * @return array The updated rowset of topic data
+	 */
+	protected function query_images(array $topic_list, array $rowset)
+	{
+		// Query the group of topics. Search for <IMG in all posts from these topics,
+		// and get either the newest (MAX) or oldest (MIN) post text containing <IMG.
+		$sql = 'SELECT topic_id, post_text
+			FROM ' . POSTS_TABLE . ' p1 
+			WHERE ' . $this->db->sql_in_set('p1.topic_id', $topic_list) . '
+				AND p1.post_time = 
+				(SELECT ' . ($this->config->offsetGet('vse_tip_new') ? 'MAX' : 'MIN') . '(p2.post_time) 
+					FROM phpbb_posts p2 
+					WHERE p2.topic_id = p1.topic_id
+						AND p2.post_text ' . $this->db->sql_like_expression($this->db->get_any_char() . '<IMG ' . $this->db->get_any_char()) . ')
+			GROUP BY topic_id';
 
-		// Update an sql join stmt
-		if ($event->offsetExists('sql_from'))
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
 		{
-			$event['sql_from'] .= ' LEFT JOIN ' . key($join['FROM']) . ' ' . current($join['FROM']) . ' ON (' . $join['ON'] . ')';
+			$rowset[$row['topic_id']]['vse_tip_text'] = $row['post_text'];
 		}
+		$this->db->sql_freeresult($result);
+
+		return $rowset;
 	}
 
 	/**
@@ -123,13 +142,13 @@ class main_listener implements EventSubscriberInterface
 	{
 		// Check if we have any post text
 		$row = $event['row'];
-		if (empty($row['post_text']))
+		if (empty($row['vse_tip_text']))
 		{
 			return;
 		}
 
 		// Check if we have any images
-		$post_text = $row['post_text'];
+		$post_text = $row['vse_tip_text'];
 		if (!preg_match('/^<[r][ >]/', $post_text) || strpos($post_text, '<IMG ') === false)
 		{
 			return;
@@ -190,7 +209,7 @@ class main_listener implements EventSubscriberInterface
 	 */
 	public function select_vse_tip_new($value, $key = '')
 	{
-		$radio_ary = array(0 => 'FIRST_POST', 1 => 'LAST_POST');
+		$radio_ary = array(1 => 'ACP_TIP_NEWEST_POST', 0 => 'ACP_TIP_OLDEST_POST');
 
 		return h_radio('config[vse_tip_new]', $radio_ary, $value, $key);
 	}
