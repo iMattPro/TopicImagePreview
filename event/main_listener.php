@@ -41,34 +41,22 @@ class main_listener implements EventSubscriberInterface
 	static public function getSubscribedEvents()
 	{
 		return [
-			// ACP settings
-			'core.acp_board_config_edit_add'		=> 'acp_config',
+			'core.acp_board_config_edit_add'		=> 'update_acp_data',
 
-			// viewforum.php events
-			'core.viewforum_get_topic_data'			=> 'modify_sql',
-			'core.viewforum_get_shadowtopic_data'	=> 'modify_sql',
-			'core.viewforum_modify_topicrow'		=> 'display_preview',
+			'core.viewforum_modify_topics_data'		=> 'update_row_data',
+			'core.viewforum_modify_topicrow'		=> 'update_tpl_data',
 
-			// search.php events
-			'core.search_get_topic_data'			=> 'modify_sql',
-			'core.search_modify_tpl_ary'			=> 'display_preview',
+			'core.search_modify_rowset'				=> 'update_row_data',
+			'core.search_modify_tpl_ary'			=> 'update_tpl_data',
 
-			// Custom events for integration with Precise Similar Topics
-			'vse.similartopics.get_topic_data'		=> 'modify_sql',
-			'vse.similartopics.modify_topicrow'		=> 'display_preview',
-
-			// Custom events for integration with Recent Topics
-			'paybas.recenttopics.sql_pull_topics_data'	=> 'modify_sql',
-			'paybas.recenttopics.modify_tpl_ary'		=> 'display_preview',
-
-			// Custom events for integration with Top Five
-			'rmcgirr83.topfive.sql_pull_topics_data'	=> 'modify_sql',
-			'rmcgirr83.topfive.modify_tpl_ary'			=> 'display_preview',
+			// ToDo: Custom events for integration with Precise Similar Topics
+			//'vse.similartopics.get_topic_data'		=> 'update_row_data',
+			//'vse.similartopics.modify_topicrow'		=> 'update_tpl_data',
 		];
 	}
 
 	/**
-	 * main_listener constructor.
+	 * Constructor
 	 *
 	 * @param \phpbb\config\config              $config
 	 * @param \phpbb\db\driver\driver_interface $db
@@ -88,7 +76,7 @@ class main_listener implements EventSubscriberInterface
 	 *
 	 * @return void
 	 */
-	public function modify_sql($event)
+	public function update_row_data($event)
 	{
 		// Use topic_list from event, otherwise create one based on the rowset
 		$topic_list = $event->offsetExists('topic_list') ? $event['topic_list'] : array_keys($event['rowset']);
@@ -132,13 +120,13 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Parse and display image previews
+	 * Extract and prepare image previews.
 	 *
 	 * @param \phpbb\event\data $event The event object
 	 *
 	 * @return void
 	 */
-	public function display_preview($event)
+	public function update_tpl_data($event)
 	{
 		// Check if we have any post text
 		$row = $event['row'];
@@ -175,13 +163,13 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Add ACP config options to Post settings
+	 * Add ACP config options to Post settings.
 	 *
 	 * @param \phpbb\event\data $event The event object
 	 *
 	 * @return void
 	 */
-	public function acp_config($event)
+	public function update_acp_data($event)
 	{
 		$display_vars = $event['display_vars'];
 		if ($event['mode'] === 'post' && array_key_exists('legend3', $display_vars['vars']))
@@ -200,7 +188,7 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Create custom radio buttons
+	 * Create custom radio buttons.
 	 *
 	 * @param mixed  $value
 	 * @param string $key
