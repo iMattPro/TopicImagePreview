@@ -25,8 +25,9 @@ class install_tip extends \phpbb\db\migration\migration
 	public function update_data()
 	{
 		return [
-			['config.add', ['vse_tip_new', 0]],
+			['config.add', ['vse_tip_new', 1]],
 			['config.add', ['vse_tip_num', 3]],
+			['config.add', ['vse_tip_dim', 200]],
 		];
 	}
 }

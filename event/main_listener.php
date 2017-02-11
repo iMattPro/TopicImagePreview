@@ -154,7 +154,7 @@ class main_listener implements EventSubscriberInterface
 
 		// Create a string of images
 		$img_string = implode(' ', array_map(function($image) {
-			return '<img src=\'' . $image . '\' style=\'max-width:200px; max-height:200px;\' />';
+			return "<img src='{$image}' style='max-width:{$this->config['vse_tip_dim']}px; max-height:{$this->config['vse_tip_dim']}px;' />";
 		}, array_slice($images, 0, (int) $this->config->offsetGet('vse_tip_num'), true)));
 
 		// Send the image string to the template
@@ -176,13 +176,14 @@ class main_listener implements EventSubscriberInterface
 		{
 			$this->language->add_lang('tip_acp', 'vse/TopicImagePreview');
 
-			$my_config_vars = array(
+			$my_config_vars = [
 				'legend_vse_tip'	=> 'ACP_TIP_TITLE',
-				'vse_tip_num'		=> array('lang' => 'ACP_TIP_DISPLAY_NUM', 'validate' => 'int:0:99', 'type' => 'number:0:99', 'explain' => true),
-				'vse_tip_new'		=> array('lang' => 'ACP_TIP_DISPLAY_AGE', 'validate' => 'bool', 'type' => 'custom', 'function' => array($this, 'select_vse_tip_new'), 'explain' => true),
-			);
+				'vse_tip_new'		=> ['lang' => 'ACP_TIP_DISPLAY_AGE', 'validate' => 'bool', 'type' => 'custom', 'function' => [$this, 'select_vse_tip_new'], 'explain' => true],
+				'vse_tip_num'		=> ['lang' => 'ACP_TIP_DISPLAY_NUM', 'validate' => 'int:0:99', 'type' => 'number:0:99', 'explain' => true],
+				'vse_tip_dim'		=> ['lang' => 'ACP_TIP_DISPLAY_DIM', 'validate' => 'int:0:999', 'type' => 'number:0:999', 'explain' => true, 'append' => ' ' . $this->language->lang('PIXEL')],
+			];
 
-			$display_vars['vars'] = phpbb_insert_config_array($display_vars['vars'], $my_config_vars, array('before' => 'legend3'));
+			$display_vars['vars'] = phpbb_insert_config_array($display_vars['vars'], $my_config_vars, ['before' => 'legend3']);
 			$event['display_vars'] = $display_vars;
 		}
 	}
@@ -197,7 +198,7 @@ class main_listener implements EventSubscriberInterface
 	 */
 	public function select_vse_tip_new($value, $key = '')
 	{
-		$radio_ary = array(1 => 'ACP_TIP_NEWEST_POST', 0 => 'ACP_TIP_OLDEST_POST');
+		$radio_ary = [1 => 'ACP_TIP_NEWEST_POST', 0 => 'ACP_TIP_OLDEST_POST'];
 
 		return h_radio('config[vse_tip_new]', $radio_ary, $value, $key);
 	}
