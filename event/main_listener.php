@@ -174,7 +174,7 @@ class main_listener implements EventSubscriberInterface
 		$display_vars = $event['display_vars'];
 		if ($event['mode'] === 'post' && array_key_exists('legend3', $display_vars['vars']))
 		{
-			$this->language->add_lang('vse_tip_acp', 'vse/TopicImagePreview');
+			$this->language->add_lang('tip_acp', 'vse/TopicImagePreview');
 
 			$my_config_vars = array(
 				'legend_vse_tip'	=> 'ACP_TIP_TITLE',

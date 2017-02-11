@@ -26,4 +26,8 @@ $lang = array_merge($lang, [
 	'ACP_TIP_OLDEST_POST'			=> 'Oldest post',
 	'ACP_TIP_DISPLAY_NUM'			=> 'Number of images to display',
 	'ACP_TIP_DISPLAY_NUM_EXPLAIN'	=> 'Maximum number of images to display in previews. Set to 0 to disable previews.',
+	'ACP_TIP_DISPLAY_DIM'			=> 'Maximum image size per preview',
+	'ACP_TIP_DISPLAY_DIM_EXPLAIN'	=> 'Maximum width/height of each image in the preview.',
+
+	'ACP_TIP_INSTALL_ERROR'			=> 'Topic Image Preview could not be installed. It requires phpBB 3.2.0 or newer.'
 ]);
