@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Display thumbnail previews of images in a topic when hovering the mouse over the topic.",
     "homepage": "",
-    "version": "1.0.0-dev",
+    "version": "1.0.0-a1",
     "license": "GPL-2.0",
     "authors": [
         {
