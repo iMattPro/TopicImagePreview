@@ -1,6 +1,6 @@
 services:
     vse.TopicImagePreview.listener:
-        class: vse\TopicImagePreview\event\main_listener
+        class: vse\TopicImagePreview\event\listener
         arguments:
             - '@config'
             - '@dbal.conn'

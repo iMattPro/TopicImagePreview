@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Topic Image Preview Event listener.
  */
-class main_listener implements EventSubscriberInterface
+class listener implements EventSubscriberInterface
 {
 	/**
 	 * @var \phpbb\config\config
