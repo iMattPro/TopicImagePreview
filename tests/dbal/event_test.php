@@ -10,7 +10,7 @@
 
 namespace vse\TopicImagePreview\tests\dbal;
 
-class simple_test extends \phpbb_database_test_case
+class event_test extends \phpbb_database_test_case
 {
 	/** @var \phpbb\config\config */
 	protected $config;
@@ -91,6 +91,27 @@ class simple_test extends \phpbb_database_test_case
 		);
 
 		return array(
+
+			array(
+				// Check all topics, topic 1 has an image, topic 2 has 2 images
+				array('vse_tip_new' => 1, 'vse_tip_num' => 3),
+				null,
+				array(
+					1 => array(),
+					2 => array(),
+					3 => array(),
+				),
+				array(
+					1 => $post[2],
+					2 => $post[5],
+					3 => null,
+				),
+				array(
+					1 => $image[1],
+					2 => "$image[3] $image[4]",
+					3 => null,
+				),
+			),
 			array(
 				// Check 1 topic, which contains 1 posted image
 				array('vse_tip_new' => 1, 'vse_tip_num' => 3),
@@ -101,7 +122,9 @@ class simple_test extends \phpbb_database_test_case
 				array(
 					1 => $post[2],
 				),
-				$image[1],
+				array(
+					1 => $image[1],
+				),
 			),
 			array(
 				// Check 2 topics, which has 2 posts with images, get up to 3 images from the newest post
@@ -115,7 +138,10 @@ class simple_test extends \phpbb_database_test_case
 					2 => $post[5],
 					3 => null,
 				),
-				"$image[3] $image[4]",
+				array(
+					2 => "$image[3] $image[4]",
+					3 => null,
+				),
 			),
 			array(
 				// Check 2 topics, which has 2 posts with images, get only show 1 image from the newest post
@@ -129,7 +155,10 @@ class simple_test extends \phpbb_database_test_case
 					2 => $post[5],
 					3 => null,
 				),
-				"$image[3]",
+				array(
+					2 => "$image[3]",
+					3 => null,
+				),
 			),
 			array(
 				// Check 2 topics, which has 2 posts with images, but only show 1 image from the oldest post
@@ -143,7 +172,10 @@ class simple_test extends \phpbb_database_test_case
 					2 => $post[4],
 					3 => null,
 				),
-				"$image[2]",
+				array(
+					2 => "$image[2]",
+					3 => null,
+				),
 			),
 		);
 	}
@@ -173,11 +205,6 @@ class simple_test extends \phpbb_database_test_case
 		{
 			$this->assertEquals($expected_row[$topic_id], $topic_data['vse_tip_text']);
 
-			if ($expected_row[$topic_id] === null)
-			{
-				continue;
-			}
-
 			// Test the update_tpl_data event
 			$row = $topic_data;
 			$topic_row = array();
@@ -190,7 +217,66 @@ class simple_test extends \phpbb_database_test_case
 			$event_data = $event->get_data_filtered($event_data);
 			$topic_row = $event_data['topic_row'];
 
-			$this->assertEquals($expected_img, $topic_row['TOPIC_IMAGES']);
+			$this->assertEquals($expected_img[$topic_id], $topic_row['TOPIC_IMAGES']);
 		}
+	}
+
+	/**
+	 * Data set for test_update_acp_data
+	 *
+	 * @return array Array of test data
+	 */
+	public function update_acp_data_data()
+	{
+		return array(
+			array( // expected config and mode
+				   'post',
+				   array('vars' => array('legend3' => array())),
+				   array('legend_vse_tip', 'vse_tip_new', 'vse_tip_num', 'vse_tip_dim', 'legend3'),
+			),
+			array( // unexpected mode
+				   'foobar',
+				   array('vars' => array('legend3' => array())),
+				   array('legend3'),
+			),
+			array( // unexpected config
+				   'post',
+				   array('vars' => array('foobar' => array())),
+				   array('foobar'),
+			),
+			array( // unexpected config and mode
+				   'foobar',
+				   array('vars' => array('foobar' => array())),
+				   array('foobar'),
+			),
+		);
+	}
+
+	/**
+	 * Test the update_acp_data event
+	 *
+	 * @dataProvider update_acp_data_data
+	 */
+	public function test_add_googleanalytics_configs($mode, $display_vars, $expected_keys)
+	{
+		require_once __DIR__ . '/../../../../../includes/functions_acp.php';
+
+		$listener = $this->getEventListener();
+
+		$event_data = array('display_vars', 'mode');
+		$event = new \phpbb\event\data(compact($event_data));
+
+		$listener->update_acp_data($event);
+
+		$event_data_after = $event->get_data_filtered($event_data);
+		foreach ($event_data as $expected)
+		{
+			$this->assertArrayHasKey($expected, $event_data_after);
+		}
+		extract($event_data_after);
+
+		$keys = array_keys($display_vars['vars']);
+
+		$this->assertEquals($expected_keys, $keys);
 	}
 }

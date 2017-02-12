@@ -37,8 +37,10 @@ class listener implements EventSubscriberInterface
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * ToDo: Custom events for integration with Precise Similar Topics
 	 */
-	static public function getSubscribedEvents()
+	public static function getSubscribedEvents()
 	{
 		return [
 			'core.acp_board_config_edit_add'		=> 'update_acp_data',
@@ -48,10 +50,6 @@ class listener implements EventSubscriberInterface
 
 			'core.search_modify_rowset'				=> 'update_row_data',
 			'core.search_modify_tpl_ary'			=> 'update_tpl_data',
-
-			// ToDo: Custom events for integration with Precise Similar Topics
-			//'vse.similartopics.get_topic_data'		=> 'update_row_data',
-			//'vse.similartopics.modify_topicrow'		=> 'update_tpl_data',
 		];
 	}
 
@@ -89,6 +87,8 @@ class listener implements EventSubscriberInterface
 
 	/**
 	 * Run an SQL query to find the posts with images in a topic's rowset.
+	 * Query a group of topics. Search for <IMG in all posts from these topics,
+	 * and get either the newest (MAX) or oldest (MIN) post text containing <IMG.
 	 *
 	 * @param array $topic_list An array of topic ids
 	 * @param array $rowset     The rowset of topic data
@@ -97,17 +97,14 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function query_images(array $topic_list, array $rowset)
 	{
-		// Query the group of topics. Search for <IMG in all posts from these topics,
-		// and get either the newest (MAX) or oldest (MIN) post text containing <IMG.
 		$sql = 'SELECT topic_id, post_text
 			FROM ' . POSTS_TABLE . ' p1 
 			WHERE ' . $this->db->sql_in_set('p1.topic_id', $topic_list) . '
-				AND p1.post_time = 
-				(SELECT ' . ($this->config->offsetGet('vse_tip_new') ? 'MAX' : 'MIN') . '(p2.post_time) 
+				AND p1.post_id = 
+				(SELECT ' . ($this->config->offsetGet('vse_tip_new') ? 'MAX' : 'MIN') . '(p2.post_id) 
 					FROM phpbb_posts p2 
 					WHERE p2.topic_id = p1.topic_id
-						AND p2.post_text ' . $this->db->sql_like_expression($this->db->get_any_char() . '<IMG ' . $this->db->get_any_char()) . ')
-			GROUP BY topic_id';
+						AND p2.post_text ' . $this->db->sql_like_expression($this->db->get_any_char() . '<IMG ' . $this->db->get_any_char()) . ')';
 
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
@@ -120,7 +117,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Extract and prepare image previews.
+	 * Add image previews to the template data.
 	 *
 	 * @param \phpbb\event\data $event The event object
 	 *
@@ -128,24 +125,17 @@ class listener implements EventSubscriberInterface
 	 */
 	public function update_tpl_data($event)
 	{
-		// Check if we have any post text
+		// Check if we have any post text or images
 		$row = $event['row'];
-		if (empty($row['vse_tip_text']))
+		if (empty($row['vse_tip_text']) || !preg_match('/^<[r][ >]/', $row['vse_tip_text']) || strpos($row['vse_tip_text'], '<IMG ') === false)
 		{
 			return;
 		}
 
-		// Check if we have any images
-		$post_text = $row['vse_tip_text'];
-		if (!preg_match('/^<[r][ >]/', $post_text) || strpos($post_text, '<IMG ') === false)
-		{
-			return;
-		}
-
-		// Grab the images
+		// Extract the images
 		$images = [];
 		$dom = new \DOMDocument;
-		$dom->loadXML($post_text);
+		$dom->loadXML($row['vse_tip_text']);
 		$xpath = new \DOMXPath($dom);
 		foreach ($xpath->query('//IMG[not(ancestor::IMG)]/@src') as $image)
 		{
@@ -155,7 +145,7 @@ class listener implements EventSubscriberInterface
 		// Create a string of images
 		$img_string = implode(' ', array_map(function($image) {
 			return "<img src='{$image}' style='max-width:{$this->config['vse_tip_dim']}px; max-height:{$this->config['vse_tip_dim']}px;' />";
-		}, array_slice($images, 0, (int) $this->config->offsetGet('vse_tip_num'), true)));
+		}, array_slice($images, 0, (int) $this->config['vse_tip_num'], true)));
 
 		// Send the image string to the template
 		$block = $event->offsetExists('topic_row') ? 'topic_row' : 'tpl_ary';

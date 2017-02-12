@@ -17,7 +17,7 @@ class install_tip extends \phpbb\db\migration\migration
 		return $this->config->offsetExists('vse_tip_new');
 	}
 
-	static public function depends_on()
+	public static function depends_on()
 	{
 		return ['\phpbb\db\migration\data\v320\v320'];
 	}
