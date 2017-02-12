@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+	<table name="phpbb_posts">
+		<column>topic_id</column>
+		<column>post_id</column>
+		<column>post_time</column>
+		<column>post_text</column>
+		<row>
+			<value>1</value>
+			<value>1</value>
+			<value>1111</value>
+			<value>&lt;t&gt;This row should be ignored&lt;/t&gt;</value>
+		</row>
+		<row>
+			<value>1</value>
+			<value>2</value>
+			<value>2222</value>
+			<value>&lt;r&gt;&lt;IMG src="http://localhost/img1.gif"&gt;&lt;s&gt;[img]&lt;/s&gt;&lt;URL url="http://localhost/img1.gif"&gt;http://localhost/img1.gif&lt;/URL&gt;&lt;e&gt;[/img]&lt;/e&gt;&lt;/IMG&gt;&lt;/r&gt;</value>
+		</row>
+
+		<row>
+			<value>2</value>
+			<value>3</value>
+			<value>3333</value>
+			<value>&lt;t&gt;This row should be ignored&lt;/t&gt;</value>
+		</row>
+		<row>
+			<value>2</value>
+			<value>4</value>
+			<value>4444</value>
+			<value>&lt;r&gt;&lt;IMG src="http://localhost/img2.gif"&gt;&lt;s&gt;[img]&lt;/s&gt;&lt;URL url="http://localhost/img2.gif"&gt;http://localhost/img2.gif&lt;/URL&gt;&lt;e&gt;[/img]&lt;/e&gt;&lt;/IMG&gt;&lt;/r&gt;</value>
+		</row>
+		<row>
+			<value>2</value>
+			<value>5</value>
+			<value>5555</value>
+			<value>&lt;r&gt;&lt;IMG src="http://localhost/img3.gif"&gt;&lt;s&gt;[img]&lt;/s&gt;&lt;URL url="http://localhost/img3.gif"&gt;http://localhost/img3.gif&lt;/URL&gt;&lt;e&gt;[/img]&lt;/e&gt;&lt;/IMG&gt;&lt;IMG src="http://localhost/img4.gif"&gt;&lt;s&gt;[img]&lt;/s&gt;&lt;URL url="http://localhost/img4.gif"&gt;http://localhost/img4.gif&lt;/URL&gt;&lt;e&gt;[/img]&lt;/e&gt;&lt;/IMG&gt;&lt;/r&gt;</value>
+		</row>
+
+		<row>
+			<value>3</value>
+			<value>6</value>
+			<value>6666</value>
+			<value>&lt;t&gt;This row should be ignored&lt;/t&gt;</value>
+		</row>
+		<row>
+			<value>3</value>
+			<value>7</value>
+			<value>7777</value>
+			<value>&lt;t&gt;This row should be ignored&lt;/t&gt;</value>
+		</row>
+	</table>
+</dataset>

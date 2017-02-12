@@ -19,6 +19,8 @@ others:
 
     phpBB/vendor/bin/phpunit -c phpBB/ext/vse/TopicImagePreview/phpunit.xml.dist
 
+[![Build Status](https://travis-ci.org/VSEphpbb/TopicImagePreview.svg?branch=master)](https://travis-ci.org/VSEphpbb/TopicImagePreview)
+
 ## License
 
 [GPLv2](license.txt)
