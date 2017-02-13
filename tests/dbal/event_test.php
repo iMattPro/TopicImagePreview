@@ -72,6 +72,8 @@ class event_test extends \phpbb_database_test_case
 			'core.viewforum_modify_topicrow',
 			'core.search_modify_rowset',
 			'core.search_modify_tpl_ary',
+			'vse.similartopics.modify_rowset',
+			'vse.similartopics.modify_topicrow',
 		), array_keys(\vse\TopicImagePreview\event\listener::getSubscribedEvents()));
 	}
 

@@ -37,19 +37,21 @@ class listener implements EventSubscriberInterface
 
 	/**
 	 * {@inheritdoc}
-	 *
-	 * ToDo: Custom events for integration with Precise Similar Topics
 	 */
 	public static function getSubscribedEvents()
 	{
 		return [
+			// ACP events
 			'core.acp_board_config_edit_add'		=> 'update_acp_data',
-
+			// Viewforum events
 			'core.viewforum_modify_topics_data'		=> 'update_row_data',
 			'core.viewforum_modify_topicrow'		=> 'update_tpl_data',
-
+			// Search events
 			'core.search_modify_rowset'				=> 'update_row_data',
 			'core.search_modify_tpl_ary'			=> 'update_tpl_data',
+			// Precise Similar Topics events
+			'vse.similartopics.modify_rowset'		=> 'update_row_data',
+			'vse.similartopics.modify_topicrow'		=> 'update_tpl_data',
 		];
 	}
 
