@@ -28,6 +28,8 @@ matrix:
       env: DB=mysqli
   allow_failures:
     - php: hhvm
+    - env: DB=mariadb
+    - env: DB=postgres
   fast_finish: true
 
 env:

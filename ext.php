@@ -17,17 +17,20 @@ class ext extends \phpbb\extension\base
 	 */
 	public function is_enableable()
 	{
-		// Requires phpBB 3.2.0 or newer.
-		$is_enableable = phpbb_version_compare(PHPBB_VERSION, '3.2.0', '>=');
+		$db   = $this->container->get('dbal.conn');
+		$lang = $this->container->get('language');
+		$lang->add_lang('tip_acp', 'vse/TopicImagePreview');
 
-		// Display a custom warning message if requirement fails.
-		if (!$is_enableable)
+		if (phpbb_version_compare(PHPBB_VERSION, '3.2.0', '<'))
 		{
-			$lang = $this->container->get('language');
-			$lang->add_lang('tip_acp', 'vse/TopicImagePreview');
-			trigger_error($lang->lang('ACP_TIP_INSTALL_ERROR'), E_USER_WARNING);
+			trigger_error($lang->lang('ACP_TIP_INVALID_BOARD'), E_USER_WARNING);
 		}
 
-		return $is_enableable;
+		if (strpos($db->get_sql_layer(), 'postgres') !== false)
+		{
+			trigger_error($lang->lang('ACP_TIP_INVALID_DBAL'), E_USER_WARNING);
+		}
+
+		return true;
 	}
 }
