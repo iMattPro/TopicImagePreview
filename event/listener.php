@@ -99,15 +99,16 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function query_images(array $topic_list, array $rowset)
 	{
-		$sql = 'SELECT ' . ($this->config->offsetGet('vse_tip_new') ? 'MAX' : 'MIN') . '(post_id), topic_id, post_text
+		$func = $this->config->offsetGet('vse_tip_new') ? 'MAX' : 'MIN';
+		$sql = 'SELECT p.topic_id, p.post_text
 			FROM (
-				SELECT post_id, post_text, topic_id
-        		FROM phpbb_posts
-        		WHERE ' . $this->db->sql_in_set('topic_id', $topic_list) . '
+				SELECT ' . $func . '(post_id) AS post_id
+				FROM ' . POSTS_TABLE . '
+				WHERE ' . $this->db->sql_in_set('topic_id', $topic_list) . '
 					AND post_text ' . $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char()) . '
-            	ORDER BY post_id ' . ($this->config->offsetGet('vse_tip_new') ? 'DESC' : 'ASC') . ') 
-            AS p
-            GROUP BY topic_id';
+				GROUP BY topic_id)
+			AS d
+			JOIN ' . POSTS_TABLE . ' p USING (post_id)';
 
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
