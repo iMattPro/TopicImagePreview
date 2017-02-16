@@ -88,9 +88,8 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Run an SQL query to find the posts with images in a topic's rowset.
-	 * Query a group of topics. Search for <IMG in all posts from these topics,
-	 * and get either the newest (MAX) or oldest (MIN) post text containing <IMG.
+	 * Run an SQL query to find the posts with images in a group topics
+	 * and the post's text to each topic's rowset.
 	 *
 	 * @param array $topic_list An array of topic ids
 	 * @param array $rowset     The rowset of topic data
@@ -99,17 +98,25 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function query_images(array $topic_list, array $rowset)
 	{
-		$func = $this->config->offsetGet('vse_tip_new') ? 'MAX' : 'MIN';
-		$sql = 'SELECT p.topic_id, p.post_text
-			FROM (
-				SELECT ' . $func . '(post_id) AS post_id
+		$sql_array = [];
+		foreach ($topic_list as $topic_id)
+		{
+			$stmt = '(SELECT topic_id, post_text 
 				FROM ' . POSTS_TABLE . '
-				WHERE ' . $this->db->sql_in_set('topic_id', $topic_list) . '
+				WHERE topic_id = ' . (int) $topic_id . '
 					AND post_text ' . $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char()) . '
-				GROUP BY topic_id)
-			AS d
-			JOIN ' . POSTS_TABLE . ' p USING (post_id)';
+				ORDER BY post_time ' . ($this->config->offsetGet('vse_tip_new') ? 'DESC' : 'ASC') . '
+				LIMIT 1)';
 
+			// SQLite3 doesn't like ORDER BY with UNION ALL, so treat $stmt as derived table
+			if ($this->db->get_sql_layer() === 'sqlite3')
+			{
+				$stmt = "SELECT * FROM $stmt AS d";
+			}
+
+			$sql_array[] = $stmt;
+		}
+		$sql = implode(' UNION ALL ', $sql_array);
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
 		{
