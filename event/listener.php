@@ -99,16 +99,21 @@ class listener implements EventSubscriberInterface
 	 */
 	protected function query_images(array $topic_list, array $rowset)
 	{
-		$func = $this->config->offsetGet('vse_tip_new') ? 'MAX' : 'MIN';
+		$sort = $this->config->offsetGet('vse_tip_new') ? 'DESC' : 'ASC';
 		$sql = 'SELECT p.topic_id, p.post_text
-			FROM (
-				SELECT ' . $func . '(post_id) AS post_id
-				FROM ' . POSTS_TABLE . '
-				WHERE ' . $this->db->sql_in_set('topic_id', $topic_list) . '
-					AND post_text ' . $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char()) . '
-				GROUP BY topic_id)
-			AS d
-			JOIN ' . POSTS_TABLE . ' p USING (post_id)';
+  			FROM (
+	  			SELECT (
+		  			SELECT p.post_id
+                	FROM ' . POSTS_TABLE . ' p
+               		WHERE p.topic_id = t.topic_id
+						AND p.post_text ' . $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char()) . '
+            		ORDER BY p.post_time ' . $sort .'
+               		LIMIT 1
+           		) AS post_id
+      			FROM ' . TOPICS_TABLE . ' t
+     			WHERE ' . $this->db->sql_in_set('t.topic_id', $topic_list) . '
+  			) AS d
+  			JOIN ' . POSTS_TABLE . ' p USING (post_id)';
 
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
