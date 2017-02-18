@@ -120,7 +120,7 @@ class listener implements EventSubscriberInterface
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
 		{
-			$rowset[$row['topic_id']]['vse_tip_text'] = $row['post_text'];
+			$rowset[$row['topic_id']]['post_text'] = $row['post_text'];
 		}
 		$this->db->sql_freeresult($result);
 
@@ -138,7 +138,7 @@ class listener implements EventSubscriberInterface
 	{
 		// Check if we have any post text or images
 		$row = $event['row'];
-		if (empty($row['vse_tip_text']) || !preg_match('/^<[r][ >]/', $row['vse_tip_text']) || strpos($row['vse_tip_text'], '<IMG ') === false)
+		if (empty($row['post_text']) || !preg_match('/^<[r][ >]/', $row['post_text']) || strpos($row['post_text'], '<IMG ') === false)
 		{
 			return;
 		}
@@ -146,7 +146,7 @@ class listener implements EventSubscriberInterface
 		// Extract the images
 		$images = [];
 		$dom = new \DOMDocument;
-		$dom->loadXML($row['vse_tip_text']);
+		$dom->loadXML($row['post_text']);
 		$xpath = new \DOMXPath($dom);
 		foreach ($xpath->query('//IMG[not(ancestor::IMG)]/@src') as $image)
 		{
