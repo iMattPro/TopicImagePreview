@@ -205,7 +205,7 @@ class event_test extends \phpbb_database_test_case
 
 		foreach ($rowset as $topic_id => $topic_data)
 		{
-			$this->assertEquals($expected_row[$topic_id], $topic_data['vse_tip_text']);
+			$this->assertEquals($expected_row[$topic_id], $topic_data['post_text']);
 
 			// Test the update_tpl_data event
 			$row = $topic_data;
