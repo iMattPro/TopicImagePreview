@@ -104,6 +104,7 @@ class listener implements EventSubscriberInterface
 			$stmt = '(SELECT topic_id, post_text 
 				FROM ' . POSTS_TABLE . '
 				WHERE topic_id = ' . (int) $topic_id . '
+					AND post_visibility = ' . ITEM_APPROVED . '
 					AND post_text ' . $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char()) . '
 				ORDER BY post_time ' . ($this->config->offsetGet('vse_tip_new') ? 'DESC' : 'ASC') . '
 				LIMIT 1)';
