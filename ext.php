@@ -25,7 +25,9 @@ class ext extends \phpbb\extension\base
 		{
 			$lang = $this->container->get('language');
 			$lang->add_lang('tip_acp', 'vse/TopicImagePreview');
-			trigger_error($lang->lang('ACP_TIP_INSTALL_ERROR'), E_USER_WARNING);
+
+			// Suppress the error in case of CLI usage
+			@trigger_error($lang->lang('ACP_TIP_INSTALL_ERROR'), E_USER_WARNING);
 		}
 
 		return $is_enableable;
