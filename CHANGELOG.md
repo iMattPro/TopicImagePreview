@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0-b1 - 2017-04-21
+
+- Only show images from approved/visibile posts.
+- Clean up error messages displayed when installed via CLI.
+
 ## 1.0.0-a5 - 2017-02-17
 
 - Massively improve database performance, up to 18x faster.
