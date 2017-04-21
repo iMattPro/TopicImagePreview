@@ -22,7 +22,7 @@
     "extra": {
         "display-name": "Topic Image Preview",
         "soft-require": {
-            "phpbb/phpbb": ">=3.2.0,<3.3"
+            "phpbb/phpbb": ">=3.2.0"
 		},
 		"version-check": {
 			"host": "vsephpbb.github.io",
