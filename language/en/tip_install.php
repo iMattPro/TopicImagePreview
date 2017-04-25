@@ -25,6 +25,6 @@ $lang = array_merge($lang, [
 // Overwrite core error message keys with a more specific message.
 // Translators can ignore this.
 $lang = array_merge($lang, [
-	'EXTENSION_NOT_ENABLEABLE'		=> $lang['EXTENSION_NOT_ENABLEABLE'] . '<br />' . $lang['TIP_INSTALL_ERROR'],
-	'CLI_EXTENSION_ENABLE_FAILURE'	=> $lang['CLI_EXTENSION_ENABLE_FAILURE'] . '. ' . $lang['TIP_INSTALL_ERROR'],
+	'EXTENSION_NOT_ENABLEABLE'		=> isset($lang['EXTENSION_NOT_ENABLEABLE']) ? $lang['EXTENSION_NOT_ENABLEABLE'] . '<br />' . $lang['TIP_INSTALL_ERROR'] : null,
+	'CLI_EXTENSION_ENABLE_FAILURE'	=> isset($lang['CLI_EXTENSION_ENABLE_FAILURE']) ? $lang['CLI_EXTENSION_ENABLE_FAILURE'] . '. ' . $lang['TIP_INSTALL_ERROR'] : null,
 ]);
