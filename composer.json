@@ -4,7 +4,7 @@
     "description": "Display thumbnail previews of images in a topic when hovering the mouse over the topic.",
     "homepage": "https://github.com/VSEphpbb/TopicImagePreview",
     "version": "1.0.0-b1",
-    "license": "GPL-2.0",
+	"license": "GPL-2.0-only",
     "authors": [
         {
 			"name": "Matt Friedman (VSE)",
