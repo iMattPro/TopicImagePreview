@@ -19,12 +19,16 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, [
-	'TIP_INSTALL_ERROR'				=> 'phpBB 3.2.0 or newer is required.',
+	'TIP_INSTALL_ERROR'	=> 'phpBB %s or newer is required.',
 ]);
 
+// TRANSLATORS CAN IGNORE THIS.
 // Overwrite core error message keys with a more specific message.
-// Translators can ignore this.
 $lang = array_merge($lang, [
-	'EXTENSION_NOT_ENABLEABLE'		=> isset($lang['EXTENSION_NOT_ENABLEABLE']) ? $lang['EXTENSION_NOT_ENABLEABLE'] . '<br />' . $lang['TIP_INSTALL_ERROR'] : null,
-	'CLI_EXTENSION_ENABLE_FAILURE'	=> isset($lang['CLI_EXTENSION_ENABLE_FAILURE']) ? $lang['CLI_EXTENSION_ENABLE_FAILURE'] . '. ' . $lang['TIP_INSTALL_ERROR'] : null,
+	'EXTENSION_NOT_ENABLEABLE'		=> isset($lang['EXTENSION_NOT_ENABLEABLE']) ?
+		$lang['EXTENSION_NOT_ENABLEABLE'] . '<br />' . sprintf($lang['TIP_INSTALL_ERROR'], \vse\TopicImagePreview\ext::PHPBB_MIN_VERSION) :
+		null,
+	'CLI_EXTENSION_ENABLE_FAILURE'	=> isset($lang['CLI_EXTENSION_ENABLE_FAILURE']) ?
+		$lang['CLI_EXTENSION_ENABLE_FAILURE'] . '. ' . sprintf($lang['TIP_INSTALL_ERROR'], \vse\TopicImagePreview\ext::PHPBB_MIN_VERSION) :
+		null,
 ]);
