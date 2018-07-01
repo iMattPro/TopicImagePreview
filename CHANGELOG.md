@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-b2 - 2018-06-30
+
+- Improved how custom installation error messages are handled.
+
 ## 1.0.0-b1 - 2017-04-21
 
 - Only show images from approved/visibile posts.
