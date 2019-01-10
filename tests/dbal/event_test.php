@@ -158,7 +158,7 @@ class event_test extends \phpbb_database_test_case
 					3 => null,
 				),
 				array(
-					2 => "$image[3]",
+					2 => (string) $image[3],
 					3 => null,
 				),
 			),
@@ -175,7 +175,7 @@ class event_test extends \phpbb_database_test_case
 					3 => null,
 				),
 				array(
-					2 => "$image[2]",
+					2 => (string) $image[2],
 					3 => null,
 				),
 			),
