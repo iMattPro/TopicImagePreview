@@ -86,10 +86,10 @@ class event_test extends \phpbb_database_test_case
 		);
 
 		$image = array(
-			1 => "<img src='http://localhost/img1.gif' style='max-width:200px; max-height:200px;' />",
-			2 => "<img src='http://localhost/img2.gif' style='max-width:200px; max-height:200px;' />",
-			3 => "<img src='http://localhost/img3.gif' style='max-width:200px; max-height:200px;' />",
-			4 => "<img src='http://localhost/img4.gif' style='max-width:200px; max-height:200px;' />",
+			1 => "<img src='http://localhost/img1.gif' alt='' style='max-width:200px; max-height:200px;' />",
+			2 => "<img src='http://localhost/img2.gif' alt='' style='max-width:200px; max-height:200px;' />",
+			3 => "<img src='http://localhost/img3.gif' alt='' style='max-width:200px; max-height:200px;' />",
+			4 => "<img src='http://localhost/img4.gif' alt='' style='max-width:200px; max-height:200px;' />",
 		);
 
 		return array(

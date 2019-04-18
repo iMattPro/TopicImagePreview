@@ -14,8 +14,9 @@
     ],
     "require": {
         "php": ">=5.4",
-		"composer/installers": "~1.0"
-    },
+		"composer/installers": "~1.0",
+		"ext-dom": "*"
+	},
 	"require-dev": {
 		"phing/phing": "2.4.*"
 	},

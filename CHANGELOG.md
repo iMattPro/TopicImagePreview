@@ -6,7 +6,7 @@
 
 ## 1.0.0-b1 - 2017-04-21
 
-- Only show images from approved/visibile posts.
+- Only show images from approved/visible posts.
 - Clean up error messages displayed when installed via CLI.
 
 ## 1.0.0-a5 - 2017-02-17

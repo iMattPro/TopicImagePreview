@@ -13,6 +13,10 @@ namespace vse\TopicImagePreview\event;
 /**
  * @ignore
  */
+
+use phpbb\config\config;
+use phpbb\db\driver\driver_interface;
+use phpbb\language\language;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -62,7 +66,7 @@ class listener implements EventSubscriberInterface
 	 * @param \phpbb\db\driver\driver_interface $db
 	 * @param \phpbb\language\language          $language
 	 */
-	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db, \phpbb\language\language $language)
+	public function __construct(config $config, driver_interface $db, language $language)
 	{
 		$this->config = $config;
 		$this->db = $db;
@@ -156,7 +160,7 @@ class listener implements EventSubscriberInterface
 
 		// Create a string of images
 		$img_string = implode(' ', array_map(function ($image) {
-			return "<img src='{$image}' style='max-width:{$this->config['vse_tip_dim']}px; max-height:{$this->config['vse_tip_dim']}px;' />";
+			return "<img src='{$image}' alt='' style='max-width:{$this->config['vse_tip_dim']}px; max-height:{$this->config['vse_tip_dim']}px;' />";
 		}, array_slice($images, 0, (int) $this->config['vse_tip_num'], true)));
 
 		// Send the image string to the template
