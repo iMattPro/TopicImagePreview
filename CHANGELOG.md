@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-b3 - 2019-04-18
+
+- Minor coding fixes.
+
 ## 1.0.0-b2 - 2018-06-30
 
 - Improved how custom installation error messages are handled.
