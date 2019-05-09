@@ -93,13 +93,15 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Run an SQL query to find the posts with images in a group topics
-	 * and the post's text to each topic's rowset.
+	 * Run an SQL query on a group of topics, and find the newest (or oldest)
+	 * post with [IMG] images. Then update the topic's row set array to include
+	 * the post's text in the cases where images were found.
 	 *
 	 * @param array $topic_list An array of topic ids
-	 * @param array $rowset     The rowset of topic data
+	 * @param array $rowset     The row set of topic data
 	 *
-	 * @return array The updated rowset of topic data
+	 * @return array The updated row set of topic data which now includes
+	 *               the post_text of a post containing images.
 	 */
 	protected function query_images(array $topic_list, array $rowset)
 	{
