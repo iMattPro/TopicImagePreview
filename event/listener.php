@@ -17,6 +17,7 @@ namespace vse\TopicImagePreview\event;
 use phpbb\config\config;
 use phpbb\db\driver\driver_interface;
 use phpbb\language\language;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -149,14 +150,8 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Extract the images
-		$images = [];
-		$dom = new \DOMDocument;
-		$dom->loadXML($row['post_text']);
-		$xpath = new \DOMXPath($dom);
-		foreach ($xpath->query('//IMG[not(ancestor::IMG)]/@src') as $image)
-		{
-			$images[] = $image->textContent;
-		}
+		$crawler = new Crawler($row['post_text']);
+		$images = $crawler->filterXpath('//img[not(ancestor::img)]')->extract(['src']);
 
 		// Create a string of images
 		$img_string = implode(' ', array_map(function ($image) {
