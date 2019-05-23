@@ -17,6 +17,7 @@ namespace vse\TopicImagePreview\event;
 use phpbb\config\config;
 use phpbb\db\driver\driver_interface;
 use phpbb\language\language;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -92,13 +93,15 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Run an SQL query to find the posts with images in a group topics
-	 * and the post's text to each topic's rowset.
+	 * Run an SQL query on a group of topics, and find the newest (or oldest)
+	 * post with [IMG] images. Then update the topic's row set array to include
+	 * the post's text in the cases where images were found.
 	 *
 	 * @param array $topic_list An array of topic ids
-	 * @param array $rowset     The rowset of topic data
+	 * @param array $rowset     The row set of topic data
 	 *
-	 * @return array The updated rowset of topic data
+	 * @return array The updated row set of topic data which now includes
+	 *               the post_text of a post containing images.
 	 */
 	protected function query_images(array $topic_list, array $rowset)
 	{
@@ -149,14 +152,8 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Extract the images
-		$images = [];
-		$dom = new \DOMDocument;
-		$dom->loadXML($row['post_text']);
-		$xpath = new \DOMXPath($dom);
-		foreach ($xpath->query('//IMG[not(ancestor::IMG)]/@src') as $image)
-		{
-			$images[] = $image->textContent;
-		}
+		$crawler = new Crawler($row['post_text']);
+		$images = $crawler->filterXpath('//img[not(ancestor::img)]')->extract(['src']);
 
 		// Create a string of images
 		$img_string = implode(' ', array_map(function ($image) {
