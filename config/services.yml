@@ -1,9 +1,20 @@
 services:
-    vse.TopicImagePreview.listener:
-        class: vse\TopicImagePreview\event\listener
+    vse.TopicImagePreview.preview:
+        class: vse\TopicImagePreview\event\preview
         arguments:
             - '@config'
             - '@dbal.conn'
+            - '@user'
+        tags:
+            - { name: event.listener }
+
+    vse.TopicImagePreview.settings:
+        class: vse\TopicImagePreview\event\settings
+        arguments:
+            - '@config'
             - '@language'
+            - '@request'
+            - '@template'
+            - '@user'
         tags:
             - { name: event.listener }

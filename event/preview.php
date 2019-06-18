@@ -10,35 +10,25 @@
 
 namespace vse\TopicImagePreview\event;
 
-/**
- * @ignore
- */
-
 use phpbb\config\config;
 use phpbb\db\driver\driver_interface;
-use phpbb\language\language;
+use phpbb\user;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Topic Image Preview Event listener.
  */
-class listener implements EventSubscriberInterface
+class preview implements EventSubscriberInterface
 {
-	/**
-	 * @var \phpbb\config\config
-	 */
+	/** @var config */
 	protected $config;
 
-	/**
-	 * @var \phpbb\db\driver\driver_interface
-	 */
+	/** @var driver_interface */
 	protected $db;
 
-	/**
-	 * @var \phpbb\language\language
-	 */
-	protected $language;
+	/** @var user */
+	protected $user;
 
 	/**
 	 * {@inheritdoc}
@@ -46,8 +36,6 @@ class listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
-			// ACP events
-			'core.acp_board_config_edit_add'		=> 'update_acp_data',
 			// Viewforum events
 			'core.viewforum_modify_topics_data'		=> 'update_row_data',
 			'core.viewforum_modify_topicrow'		=> 'update_tpl_data',
@@ -63,15 +51,15 @@ class listener implements EventSubscriberInterface
 	/**
 	 * Constructor
 	 *
-	 * @param \phpbb\config\config              $config
-	 * @param \phpbb\db\driver\driver_interface $db
-	 * @param \phpbb\language\language          $language
+	 * @param config           $config
+	 * @param driver_interface $db
+	 * @param user             $user
 	 */
-	public function __construct(config $config, driver_interface $db, language $language)
+	public function __construct(config $config, driver_interface $db, user $user)
 	{
 		$this->config = $config;
 		$this->db = $db;
-		$this->language = $language;
+		$this->user = $user;
 	}
 
 	/**
@@ -83,6 +71,11 @@ class listener implements EventSubscriberInterface
 	 */
 	public function update_row_data($event)
 	{
+		if (empty($this->user->data['user_vse_tip']))
+		{
+			return;
+		}
+
 		// Use topic_list from event, otherwise create one based on the rowset
 		$topic_list = $event->offsetExists('topic_list') ? $event['topic_list'] : array_keys($event['rowset']);
 
@@ -145,14 +138,13 @@ class listener implements EventSubscriberInterface
 	public function update_tpl_data($event)
 	{
 		// Check if we have any post text or images
-		$row = $event['row'];
-		if (empty($row['post_text']) || !preg_match('/^<[r][ >]/', $row['post_text']) || strpos($row['post_text'], '<IMG ') === false)
+		if (empty($this->user->data['user_vse_tip']) || empty($event['row']['post_text']) || !preg_match('/^<[r][ >]/', $event['row']['post_text']) || strpos($event['row']['post_text'], '<IMG ') === false)
 		{
 			return;
 		}
 
 		// Extract the images
-		$crawler = new Crawler($row['post_text']);
+		$crawler = new Crawler($event['row']['post_text']);
 		$images = $crawler->filterXpath('//img[not(ancestor::img)]')->extract(['src']);
 
 		// Create a string of images
@@ -163,46 +155,5 @@ class listener implements EventSubscriberInterface
 		// Send the image string to the template
 		$block = $event->offsetExists('topic_row') ? 'topic_row' : 'tpl_ary';
 		$event[$block] = array_merge($event[$block], ['TOPIC_IMAGES' => $img_string]);
-	}
-
-	/**
-	 * Add ACP config options to Post settings.
-	 *
-	 * @param \phpbb\event\data $event The event object
-	 *
-	 * @return void
-	 */
-	public function update_acp_data($event)
-	{
-		$display_vars = $event['display_vars'];
-		if ($event['mode'] === 'post' && array_key_exists('legend3', $display_vars['vars']))
-		{
-			$this->language->add_lang('tip_acp', 'vse/TopicImagePreview');
-
-			$my_config_vars = [
-				'legend_vse_tip'	=> 'ACP_TIP_TITLE',
-				'vse_tip_new'		=> ['lang' => 'ACP_TIP_DISPLAY_AGE', 'validate' => 'bool', 'type' => 'custom', 'function' => [$this, 'select_vse_tip_new'], 'explain' => true],
-				'vse_tip_num'		=> ['lang' => 'ACP_TIP_DISPLAY_NUM', 'validate' => 'int:0:99', 'type' => 'number:0:99', 'explain' => true],
-				'vse_tip_dim'		=> ['lang' => 'ACP_TIP_DISPLAY_DIM', 'validate' => 'int:0:999', 'type' => 'number:0:999', 'explain' => true, 'append' => ' ' . $this->language->lang('PIXEL')],
-			];
-
-			$display_vars['vars'] = phpbb_insert_config_array($display_vars['vars'], $my_config_vars, ['before' => 'legend3']);
-			$event['display_vars'] = $display_vars;
-		}
-	}
-
-	/**
-	 * Create custom radio buttons.
-	 *
-	 * @param mixed  $value
-	 * @param string $key
-	 *
-	 * @return string
-	 */
-	public function select_vse_tip_new($value, $key = '')
-	{
-		$radio_ary = [1 => 'ACP_TIP_NEWEST_POST', 0 => 'ACP_TIP_OLDEST_POST'];
-
-		return h_radio('config[vse_tip_new]', $radio_ary, $value, $key);
 	}
 }
