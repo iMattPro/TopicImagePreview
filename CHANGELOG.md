@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-b5 - 2019-06-18
+
+- Added a UCP display preference so users can disable image previews.
+
 ## 1.0.0-b4 - 2019-05-22
 
 - Switch to Symfony's crawler to parse images out of posts.
