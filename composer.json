@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Display thumbnail previews of images in a topic when hovering the mouse over the topic.",
     "homepage": "https://github.com/VSEphpbb/TopicImagePreview",
-    "version": "1.0.0-b4",
+    "version": "1.0.0-b5",
 	"license": "GPL-2.0-only",
     "authors": [
         {
@@ -14,7 +14,8 @@
     ],
     "require": {
         "php": ">=5.4",
-		"composer/installers": "~1.0"
+		"composer/installers": "~1.0",
+		"ext-dom": "*"
 	},
 	"require-dev": {
 		"phing/phing": "2.4.*"
