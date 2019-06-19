@@ -1,8 +1,9 @@
 # Changelog
 
-## 1.0.0-b5 - 2019-06-18
+## 1.0.0-b5 - 2019-06-19
 
 - Added a UCP display preference so users can disable image previews.
+- Reverted back from Symfony's crawler to PHP's DOMDocument crawler.
 
 ## 1.0.0-b4 - 2019-05-22
 
