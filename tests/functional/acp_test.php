@@ -17,7 +17,7 @@ class acp_test extends \phpbb_functional_test_case
 {
 	protected static function setup_extensions()
 	{
-		return array('vse/TopicImagePreview');
+		return ['vse/TopicImagePreview'];
 	}
 
 	public function test_acp_settings()
@@ -32,7 +32,7 @@ class acp_test extends \phpbb_functional_test_case
 
 		$crawler = self::request('GET', 'adm/index.php?i=acp_board&mode=post&sid=' . $this->sid);
 
-		$nodes = $crawler->filter('#acp_board > fieldset > legend')->extract(array('_text'));
+		$nodes = $crawler->filter('#acp_board > fieldset > legend')->extract(['_text']);
 		foreach ($nodes as $key => $config_name)
 		{
 			if (strpos($config_name, $this->lang('POSTING')) !== 0)
