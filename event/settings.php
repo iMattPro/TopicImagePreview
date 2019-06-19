@@ -112,6 +112,8 @@ class settings implements EventSubscriberInterface
 	 * Get user's Topic Image Preview option and display it in UCP Preferences page
 	 *
 	 * @param \phpbb\event\data $event The event object
+	 *
+	 * @return void
 	 */
 	public function handle_ucp_data($event)
 	{
@@ -137,6 +139,8 @@ class settings implements EventSubscriberInterface
 	 * Add user's Topic Image Preview option state into UCP sql_array
 	 *
 	 * @param \phpbb\event\data $event The event object
+	 *
+	 * @return void
 	 */
 	public function update_ucp_data($event)
 	{

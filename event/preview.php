@@ -13,7 +13,6 @@ namespace vse\TopicImagePreview\event;
 use phpbb\config\config;
 use phpbb\db\driver\driver_interface;
 use phpbb\user;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -86,6 +85,26 @@ class preview implements EventSubscriberInterface
 	}
 
 	/**
+	 * Add image previews to the template data.
+	 *
+	 * @param \phpbb\event\data $event The event object
+	 *
+	 * @return void
+	 */
+	public function update_tpl_data($event)
+	{
+		// Check if we have any post text or images
+		if (empty($this->user->data['user_vse_tip']) || empty($event['row']['post_text']) || !preg_match('/^<[r][ >]/', $event['row']['post_text']) || strpos($event['row']['post_text'], '<IMG ') === false)
+		{
+			return;
+		}
+
+		// Send the image string to the template
+		$block = $event->offsetExists('topic_row') ? 'topic_row' : 'tpl_ary';
+		$event[$block] = array_merge($event[$block], ['TOPIC_IMAGES' => $this->extract_images($event['row']['post_text'])]);
+	}
+
+	/**
 	 * Run an SQL query on a group of topics, and find the newest (or oldest)
 	 * post with [IMG] images. Then update the topic's row set array to include
 	 * the post's text in the cases where images were found.
@@ -129,31 +148,27 @@ class preview implements EventSubscriberInterface
 	}
 
 	/**
-	 * Add image previews to the template data.
+	 * Extract images from a post and return them as HTML image tags.
 	 *
-	 * @param \phpbb\event\data $event The event object
+	 * @param string $post Post text from the database.
 	 *
-	 * @return void
+	 * @return string An string of HTML IMG tags.
 	 */
-	public function update_tpl_data($event)
+	protected function extract_images($post)
 	{
-		// Check if we have any post text or images
-		if (empty($this->user->data['user_vse_tip']) || empty($event['row']['post_text']) || !preg_match('/^<[r][ >]/', $event['row']['post_text']) || strpos($event['row']['post_text'], '<IMG ') === false)
+		// Extract the images
+		$images = [];
+		$dom = new \DOMDocument;
+		$dom->loadXML($post);
+		$xpath = new \DOMXPath($dom);
+		foreach ($xpath->query('//IMG[not(ancestor::IMG)]/@src') as $image)
 		{
-			return;
+			$images[] = $image->textContent;
 		}
 
-		// Extract the images
-		$crawler = new Crawler($event['row']['post_text']);
-		$images = $crawler->filterXpath('//img[not(ancestor::img)]')->extract(['src']);
-
 		// Create a string of images
-		$img_string = implode(' ', array_map(function ($image) {
+		return implode(' ', array_map(function ($image) {
 			return "<img src='{$image}' alt='' style='max-width:{$this->config['vse_tip_dim']}px; max-height:{$this->config['vse_tip_dim']}px;' />";
 		}, array_slice($images, 0, (int) $this->config['vse_tip_num'], true)));
-
-		// Send the image string to the template
-		$block = $event->offsetExists('topic_row') ? 'topic_row' : 'tpl_ary';
-		$event[$block] = array_merge($event[$block], ['TOPIC_IMAGES' => $img_string]);
 	}
 }
