@@ -19,4 +19,4 @@ cp -R . ../../tmp
 cd ../../
 
 # Clone phpBB
-git clone --depth=1 "git://github.com/phpbb/phpbb.git" "phpBB3" --branch=$BRANCH
+git clone --depth=1 "git://github.com/phpbb/phpbb.git" "phpBB3" --branch="$BRANCH"
