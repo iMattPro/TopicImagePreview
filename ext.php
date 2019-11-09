@@ -15,7 +15,7 @@ class ext extends \phpbb\extension\base
 	/**
 	 * The minimum phpBB version required by this extension
 	 */
-	const PHPBB_MIN_VERSION = '3.2.0';
+	const PHPBB_MIN_VERSION = '3.2.1';
 
 	/**
 	 * {@inheritdoc}
