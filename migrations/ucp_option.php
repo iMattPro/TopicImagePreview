@@ -8,7 +8,7 @@
  *
  */
 
-namespace vse\TopicImagePreview\migrations;
+namespace vse\topicimagepreview\migrations;
 
 class ucp_option extends \phpbb\db\migration\migration
 {
@@ -19,7 +19,7 @@ class ucp_option extends \phpbb\db\migration\migration
 
 	public static function depends_on()
 	{
-		return ['\vse\TopicImagePreview\migrations\install_tip'];
+		return ['\vse\topicimagepreview\migrations\install_tip'];
 	}
 
 	public function update_schema()

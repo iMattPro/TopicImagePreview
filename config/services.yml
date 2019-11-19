@@ -1,6 +1,6 @@
 services:
-    vse.TopicImagePreview.preview:
-        class: vse\TopicImagePreview\event\preview
+    vse.topicimagepreview.preview:
+        class: vse\topicimagepreview\event\preview
         arguments:
             - '@config'
             - '@dbal.conn'
@@ -8,8 +8,8 @@ services:
         tags:
             - { name: event.listener }
 
-    vse.TopicImagePreview.settings:
-        class: vse\TopicImagePreview\event\settings
+    vse.topicimagepreview.settings:
+        class: vse\topicimagepreview\event\settings
         arguments:
             - '@config'
             - '@language'

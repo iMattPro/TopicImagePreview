@@ -8,7 +8,7 @@
  *
  */
 
-namespace vse\TopicImagePreview;
+namespace vse\topicimagepreview;
 
 class ext extends \phpbb\extension\base
 {
@@ -29,7 +29,7 @@ class ext extends \phpbb\extension\base
 		if (!$is_enableable)
 		{
 			$lang = $this->container->get('language');
-			$lang->add_lang('tip_install', 'vse/TopicImagePreview');
+			$lang->add_lang('tip_install', 'vse/topicimagepreview');
 		}
 
 		return $is_enableable;

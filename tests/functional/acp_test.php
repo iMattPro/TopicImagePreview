@@ -8,7 +8,7 @@
  *
  */
 
-namespace vse\TopicImagePreview\tests\functional;
+namespace vse\topicimagepreview\tests\functional;
 
 /**
  * @group functional
@@ -17,7 +17,7 @@ class acp_test extends \phpbb_functional_test_case
 {
 	protected static function setup_extensions()
 	{
-		return ['vse/TopicImagePreview'];
+		return ['vse/topicimagepreview'];
 	}
 
 	public function test_acp_settings()
@@ -26,7 +26,7 @@ class acp_test extends \phpbb_functional_test_case
 		$this->admin_login();
 
 		$this->add_lang('acp/board');
-		$this->add_lang_ext('vse/TopicImagePreview', 'tip_acp');
+		$this->add_lang_ext('vse/topicimagepreview', 'tip_acp');
 
 		$found = false;
 

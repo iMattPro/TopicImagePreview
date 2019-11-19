@@ -8,7 +8,7 @@
  *
  */
 
-namespace vse\TopicImagePreview\tests\event;
+namespace vse\topicimagepreview\tests\event;
 
 class base extends \phpbb_database_test_case
 {
@@ -32,7 +32,7 @@ class base extends \phpbb_database_test_case
 
 	protected static function setup_extensions()
 	{
-		return ['vse/TopicImagePreview'];
+		return ['vse/topicimagepreview'];
 	}
 
 	public function getDataSet()

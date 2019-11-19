@@ -8,7 +8,7 @@
  *
  */
 
-namespace vse\TopicImagePreview\migrations;
+namespace vse\topicimagepreview\migrations;
 
 class install_tip extends \phpbb\db\migration\migration
 {

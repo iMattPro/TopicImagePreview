@@ -8,7 +8,7 @@
  *
  */
 
-namespace vse\TopicImagePreview\event;
+namespace vse\topicimagepreview\event;
 
 use phpbb\config\config;
 use phpbb\db\driver\driver_interface;

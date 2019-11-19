@@ -8,13 +8,13 @@
  *
  */
 
-namespace vse\TopicImagePreview\tests\event;
+namespace vse\topicimagepreview\tests\event;
 
 class settings_test extends base
 {
 	public function getEventListener()
 	{
-		return new \vse\TopicImagePreview\event\settings(
+		return new \vse\topicimagepreview\event\settings(
 			$this->config,
 			$this->language,
 			$this->request,
@@ -34,7 +34,7 @@ class settings_test extends base
 			'core.acp_board_config_edit_add',
 			'core.ucp_prefs_view_data',
 			'core.ucp_prefs_view_update_data',
-		], array_keys(\vse\TopicImagePreview\event\settings::getSubscribedEvents()));
+		], array_keys(\vse\topicimagepreview\event\settings::getSubscribedEvents()));
 	}
 
 	public function update_acp_data_data()

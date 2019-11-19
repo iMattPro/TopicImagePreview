@@ -8,7 +8,7 @@
  *
  */
 
-namespace vse\TopicImagePreview\event;
+namespace vse\topicimagepreview\event;
 
 use phpbb\config\config;
 use phpbb\language\language;
@@ -80,7 +80,7 @@ class settings implements EventSubscriberInterface
 	{
 		if ($event['mode'] === 'post' && array_key_exists('legend3', $event['display_vars']['vars']))
 		{
-			$this->language->add_lang('tip_acp', 'vse/TopicImagePreview');
+			$this->language->add_lang('tip_acp', 'vse/topicimagepreview');
 
 			$my_config_vars = [
 				'legend_vse_tip'	=> 'ACP_TIP_TITLE',
@@ -127,7 +127,7 @@ class settings implements EventSubscriberInterface
 		// Output the data vars to the template (except on form submit)
 		if (!$event['submit'])
 		{
-			$this->language->add_lang('tip_ucp', 'vse/TopicImagePreview');
+			$this->language->add_lang('tip_ucp', 'vse/topicimagepreview');
 			$this->template->assign_vars([
 				'S_VSE_TIP_NUM' => $this->config->offsetGet('vse_tip_num'),
 				'S_VSE_TIP_USER' => $event['data']['user_vse_tip'],

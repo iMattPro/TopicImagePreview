@@ -8,13 +8,13 @@
  *
  */
 
-namespace vse\TopicImagePreview\tests\event;
+namespace vse\topicimagepreview\tests\event;
 
 class preview_test extends base
 {
 	public function getEventListener()
 	{
-		return new \vse\TopicImagePreview\event\preview(
+		return new \vse\topicimagepreview\event\preview(
 			$this->config,
 			$this->db,
 			$this->user
@@ -35,7 +35,7 @@ class preview_test extends base
 			'core.search_modify_tpl_ary',
 			'vse.similartopics.modify_rowset',
 			'vse.similartopics.modify_topicrow',
-		], array_keys(\vse\TopicImagePreview\event\preview::getSubscribedEvents()));
+		], array_keys(\vse\topicimagepreview\event\preview::getSubscribedEvents()));
 	}
 
 	public function preview_events_test_data()
