@@ -15,6 +15,7 @@ class preview_test extends base
 	public function getEventListener()
 	{
 		return new \vse\topicimagepreview\event\preview(
+			$this->auth,
 			$this->config,
 			$this->db,
 			$this->user
@@ -29,6 +30,7 @@ class preview_test extends base
 	public function test_getSubscribedEvents()
 	{
 		$this->assertEquals([
+			'core.permissions',
 			'core.viewforum_modify_topics_data',
 			'core.viewforum_modify_topicrow',
 			'core.search_modify_rowset',
@@ -147,6 +149,11 @@ class preview_test extends base
 	 */
 	public function test_preview_events($configs, $topic_list, $rowset, $expected_row, $expected_img)
 	{
+		$this->auth->expects($this->atLeastOnce())
+			->method('acl_get')
+			->with($this->stringContains('_'), $this->anything())
+			->willReturnMap([['f_vse_tip', null, true]]);
+
 		foreach ($configs as $key => $config)
 		{
 			$this->config[$key] = $config;

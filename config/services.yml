@@ -2,6 +2,7 @@ services:
     vse.topicimagepreview.preview:
         class: vse\topicimagepreview\event\preview
         arguments:
+            - '@auth'
             - '@config'
             - '@dbal.conn'
             - '@user'

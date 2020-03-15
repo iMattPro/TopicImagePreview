@@ -10,6 +10,7 @@
 
 namespace vse\topicimagepreview\event;
 
+use phpbb\auth\auth;
 use phpbb\config\config;
 use phpbb\db\driver\driver_interface;
 use phpbb\user;
@@ -20,6 +21,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class preview implements EventSubscriberInterface
 {
+	/** @var auth */
+	protected $auth;
+
 	/** @var config */
 	protected $config;
 
@@ -35,6 +39,7 @@ class preview implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
+			'core.permissions'						=> 'add_permission',
 			// Viewforum events
 			'core.viewforum_modify_topics_data'		=> 'update_row_data',
 			'core.viewforum_modify_topicrow'		=> 'update_tpl_data',
@@ -50,15 +55,31 @@ class preview implements EventSubscriberInterface
 	/**
 	 * Constructor
 	 *
+	 * @param auth             $auth
 	 * @param config           $config
 	 * @param driver_interface $db
 	 * @param user             $user
 	 */
-	public function __construct(config $config, driver_interface $db, user $user)
+	public function __construct(auth $auth, config $config, driver_interface $db, user $user)
 	{
+		$this->auth = $auth;
 		$this->config = $config;
 		$this->db = $db;
 		$this->user = $user;
+	}
+
+	/**
+	 * Add administrative permissions to manage forums
+	 *
+	 * @param \phpbb\event\data $event The event object
+	 * @return void
+	 */
+	public function add_permission($event)
+	{
+		$event->update_subarray('permissions', 'f_vse_tip', [
+			'lang' => 'ACL_F_VSE_TIP',
+			'cat'  => 'actions',
+		]);
 	}
 
 	/**
@@ -70,7 +91,7 @@ class preview implements EventSubscriberInterface
 	 */
 	public function update_row_data($event)
 	{
-		if (empty($this->user->data['user_vse_tip']))
+		if (!$this->user_allowed())
 		{
 			return;
 		}
@@ -93,8 +114,7 @@ class preview implements EventSubscriberInterface
 	 */
 	public function update_tpl_data($event)
 	{
-		// Check if we have any post text or images
-		if (empty($this->user->data['user_vse_tip']) || empty($event['row']['post_text']) || !preg_match('/^<[r][ >]/', $event['row']['post_text']) || strpos($event['row']['post_text'], '<IMG ') === false)
+		if (!$this->user_allowed() || !$this->forum_allowed($event['row']['forum_id']) || !$this->has_images($event))
 		{
 			return;
 		}
@@ -120,7 +140,12 @@ class preview implements EventSubscriberInterface
 		$sql_array = [];
 		foreach ($topic_list as $topic_id)
 		{
-			$stmt = '(SELECT topic_id, post_text 
+			if (!$this->forum_allowed($rowset[$topic_id]['forum_id']))
+			{
+				continue;
+			}
+
+			$stmt = '(SELECT topic_id, post_text
 				FROM ' . POSTS_TABLE . '
 				WHERE topic_id = ' . (int) $topic_id . '
 					AND post_visibility = ' . ITEM_APPROVED . '
@@ -136,13 +161,17 @@ class preview implements EventSubscriberInterface
 
 			$sql_array[] = $stmt;
 		}
-		$sql = implode(' UNION ALL ', $sql_array);
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result))
+
+		if (count($sql_array))
 		{
-			$rowset[$row['topic_id']]['post_text'] = $row['post_text'];
+			$sql = implode(' UNION ALL ', $sql_array);
+			$result = $this->db->sql_query($sql);
+			while ($row = $this->db->sql_fetchrow($result))
+			{
+				$rowset[$row['topic_id']]['post_text'] = $row['post_text'];
+			}
+			$this->db->sql_freeresult($result);
 		}
-		$this->db->sql_freeresult($result);
 
 		return $rowset;
 	}
@@ -170,5 +199,37 @@ class preview implements EventSubscriberInterface
 		return implode(' ', array_map(function ($image) {
 			return "<img src='{$image}' alt='' style='max-width:{$this->config['vse_tip_dim']}px; max-height:{$this->config['vse_tip_dim']}px;' />";
 		}, array_slice($images, 0, (int) $this->config['vse_tip_num'], true)));
+	}
+
+	/**
+	 * Is the forum allowed to show topic image previews
+	 *
+	 * @param int $forum_id Forum identifier
+	 * @return bool True if allowed, false if not
+	 */
+	protected function forum_allowed($forum_id)
+	{
+		return (bool) $this->auth->acl_get('f_vse_tip', $forum_id);
+	}
+
+	/**
+	 * Does the user allow topic image previews?
+	 *
+	 * @return bool True if allowed, false if not
+	 */
+	protected function user_allowed()
+	{
+		return (bool) $this->user->data['user_vse_tip'];
+	}
+
+	/**
+	 * Check if we have post with images
+	 *
+	 * @param \phpbb\event\data $event The event object
+	 * @return bool True if images found in post text, false if not
+	 */
+	protected function has_images($event)
+	{
+		return !empty($event['row']['post_text']) && preg_match('/^<[r][ >]/', $event['row']['post_text']) && strpos($event['row']['post_text'], '<IMG ') !== false;
 	}
 }
