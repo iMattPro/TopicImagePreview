@@ -43,6 +43,8 @@ class settings implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
+			// Global events
+			'core.permissions'						=> 'add_permission',
 			// ACP events
 			'core.acp_board_config_edit_add'		=> 'update_acp_data',
 			// UCP events
@@ -67,6 +69,20 @@ class settings implements EventSubscriberInterface
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
+	}
+
+	/**
+	 * Add administrative permissions to manage forums
+	 *
+	 * @param \phpbb\event\data $event The event object
+	 * @return void
+	 */
+	public function add_permission($event)
+	{
+		$event->update_subarray('permissions', 'f_vse_tip', [
+			'lang' => 'ACL_F_VSE_TIP',
+			'cat'  => 'actions',
+		]);
 	}
 
 	/**

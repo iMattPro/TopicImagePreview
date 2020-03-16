@@ -39,7 +39,6 @@ class preview implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
-			'core.permissions'						=> 'add_permission',
 			// Viewforum events
 			'core.viewforum_modify_topics_data'		=> 'update_row_data',
 			'core.viewforum_modify_topicrow'		=> 'update_tpl_data',
@@ -68,18 +67,7 @@ class preview implements EventSubscriberInterface
 		$this->user = $user;
 	}
 
-	/**
-	 * Add administrative permissions to manage forums
-	 *
-	 * @param \phpbb\event\data $event The event object
-	 * @return void
-	 */
-	public function add_permission($event)
 	{
-		$event->update_subarray('permissions', 'f_vse_tip', [
-			'lang' => 'ACL_F_VSE_TIP',
-			'cat'  => 'actions',
-		]);
 	}
 
 	/**

@@ -31,7 +31,7 @@ class permissions extends \phpbb\db\migration\migration
 	 */
 	public static function depends_on()
 	{
-		return array('\vse\topicimagepreview\migrations\install_tip');
+		return ['\vse\topicimagepreview\migrations\install_tip'];
 	}
 
 	/**
@@ -39,18 +39,13 @@ class permissions extends \phpbb\db\migration\migration
 	 */
 	public function update_data()
 	{
-		return array(
+		return [
 			// Add permission
-			array('permission.add', array('f_vse_tip', false)),
+			['permission.add', ['f_vse_tip', false, 'f_list_topics']],
 
-			// Set permission roles
-			array('permission.permission_set', array('ROLE_FORUM_FULL', 'f_vse_tip')),
-			array('permission.permission_set', array('ROLE_FORUM_LIMITED', 'f_vse_tip')),
-			array('permission.permission_set', array('ROLE_FORUM_LIMITED_POLLS', 'f_vse_tip')),
-			array('permission.permission_set', array('ROLE_FORUM_NEW_MEMBER', 'f_vse_tip')),
-			array('permission.permission_set', array('ROLE_FORUM_POLLS', 'f_vse_tip')),
-			array('permission.permission_set', array('ROLE_FORUM_READONLY', 'f_vse_tip')),
-			array('permission.permission_set', array('ROLE_FORUM_STANDARD', 'f_vse_tip')),
-		);
+			// Unset permissions that may have been set by copying from f_list_topics
+			['permission.permission_unset', ['ROLE_FORUM_BOT', 'f_vse_tip']],
+			['permission.permission_unset', ['ROLE_FORUM_ONQUEUE', 'f_vse_tip']],
+		];
 	}
 }
