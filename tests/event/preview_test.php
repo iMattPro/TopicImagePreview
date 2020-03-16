@@ -15,10 +15,13 @@ class preview_test extends base
 	public function getEventListener()
 	{
 		return new \vse\topicimagepreview\event\preview(
-			$this->auth,
 			$this->config,
-			$this->db,
-			$this->user
+			new \vse\topicimagepreview\factory(
+				$this->auth,
+				$this->config,
+				$this->db,
+				$this->user
+			)
 		);
 	}
 
@@ -30,7 +33,6 @@ class preview_test extends base
 	public function test_getSubscribedEvents()
 	{
 		$this->assertEquals([
-			'core.permissions',
 			'core.viewforum_modify_topics_data',
 			'core.viewforum_modify_topicrow',
 			'core.search_modify_rowset',
@@ -40,7 +42,7 @@ class preview_test extends base
 		], array_keys(\vse\topicimagepreview\event\preview::getSubscribedEvents()));
 	}
 
-	public function preview_events_test_data()
+	public function preview_factory_test_data()
 	{
 		$post = [
 			2 => '<r><IMG src="http://localhost/img1.gif"><s>[img]</s><URL url="http://localhost/img1.gif">http://localhost/img1.gif</URL><e>[/img]</e></IMG></r>',
@@ -60,134 +62,65 @@ class preview_test extends base
 				// Check all topics, user does not allow images so results should be null
 				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 0, 'f_vse_tip' => 1],
 				null,
-				[
-					1 => [],
-					2 => [],
-					3 => [],
-				],
-				[
-					1 => null,
-					2 => null,
-					3 => null,
-				],
-				[
-					1 => null,
-					2 => null,
-					3 => null,
-				],
+				[1 => [], 2 => [], 3 => [],],
+				[1 => null, 2 => null, 3 => null,],
+				[1 => null, 2 => null, 3 => null],
 			],
 			[
 				// Check all topics, forum does not allow images so results should be null
 				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 1, 'f_vse_tip' => 0],
 				null,
-				[
-					1 => [],
-					2 => [],
-					3 => [],
-				],
-				[
-					1 => null,
-					2 => null,
-					3 => null,
-				],
-				[
-					1 => null,
-					2 => null,
-					3 => null,
-				],
+				[1 => [], 2 => [], 3 => []],
+				[1 => null, 2 => null, 3 => null],
+				[1 => null, 2 => null, 3 => null],
 			],
 			[
 				// Check all topics, topic 1 has an image, topic 2 has 2 images
 				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				null,
-				[
-					1 => [],
-					2 => [],
-					3 => [],
-				],
-				[
-					1 => $post[2],
-					2 => $post[5],
-					3 => null,
-				],
-				[
-					1 => $image[1],
-					2 => "$image[3] $image[4]",
-					3 => null,
-				],
+				[1 => [], 2 => [], 3 => []],
+				[1 => $post[2], 2 => $post[5], 3 => null],
+				[1 => $image[1], 2 => "$image[3] $image[4]", 3 => null],
 			],
 			[
 				// Check 1 topic, which contains 1 posted image
 				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				null,
-				[
-					1 => [],
-				],
-				[
-					1 => $post[2],
-				],
-				[
-					1 => $image[1],
-				],
+				[1 => []],
+				[1 => $post[2]],
+				[1 => $image[1]],
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, get up to 3 images from the newest post
 				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				[2, 3],
-				[
-					2 => [],
-					3 => [],
-				],
-				[
-					2 => $post[5],
-					3 => null,
-				],
-				[
-					2 => "$image[3] $image[4]",
-					3 => null,
-				],
+				[2 => [], 3 => []],
+				[2 => $post[5], 3 => null],
+				[2 => "$image[3] $image[4]", 3 => null],
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, get only show 1 image from the newest post
 				['vse_tip_new' => 1, 'vse_tip_num' => 1, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				[2, 3],
-				[
-					2 => [],
-					3 => [],
-				],
-				[
-					2 => $post[5],
-					3 => null,
-				],
-				[
-					2 => (string) $image[3],
-					3 => null,
-				],
+				[2 => [], 3 => []],
+				[2 => $post[5], 3 => null],
+				[2 => (string) $image[3], 3 => null],
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, but only show 1 image from the oldest post
 				['vse_tip_new' => 0, 'vse_tip_num' => 1, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				[2, 3],
-				[
-					2 => [],
-					3 => [],
-				],
-				[
-					2 => $post[4],
-					3 => null,
-				],
-				[
-					2 => (string) $image[2],
-					3 => null,
-				],
+				[2 => [], 3 => []],
+				[2 => $post[4], 3 => null],
+				[2 => (string) $image[2], 3 => null],
 			],
 		];
 	}
 
 	/**
-	 * @dataProvider preview_events_test_data
+	 * @dataProvider preview_factory_test_data
 	 */
-	public function test_preview_events($configs, $topic_list, $rowset, $expected_row, $expected_img)
+	public function test_preview_factory($configs, $topic_list, $rowset, $expected_row, $expected_img)
 	{
 		foreach ($configs as $key => $config)
 		{
@@ -215,7 +148,7 @@ class preview_test extends base
 		$event_data = ['rowset', 'topic_list'];
 		$event = new \phpbb\event\data(compact($event_data));
 
-		$listener->update_row_data($event);
+		$listener->viewforum_row($event);
 
 		$event_data = $event->get_data_filtered($event_data);
 
@@ -230,7 +163,7 @@ class preview_test extends base
 			$event_data = ['row', 'topic_row'];
 			$event = new \phpbb\event\data(compact($event_data));
 
-			$listener->update_tpl_data($event);
+			$listener->viewforum_tpl($event);
 
 			$event_data = $event->get_data_filtered($event_data);
 			$topic_row = $event_data['topic_row'];
@@ -239,40 +172,45 @@ class preview_test extends base
 		}
 	}
 
-	public function add_permissions_test_data()
+	public function preview_events_data()
 	{
 		return [
-			[
-				[],
-				[
-					'f_vse_tip' => ['lang' => 'ACL_F_VSE_TIP', 'cat' => 'actions'],
-				],
-			],
-			[
-				[
-					'a_foo' => ['lang' => 'ACL_A_FOO', 'cat' => 'misc'],
-				],
-				[
-					'a_foo' => ['lang' => 'ACL_A_FOO', 'cat' => 'misc'],
-					'f_vse_tip' => ['lang' => 'ACL_F_VSE_TIP', 'cat' => 'actions'],
-				],
-			],
+			['viewforum', [], [], true],
+			['searchresults', ['show_results' => 'topics'], ['vse_tip_srt' => 1], true],
+			['searchresults', ['show_results' => 'topics'], ['vse_tip_srt' => 0], false],
+			['searchresults', ['show_results' => 'posts'], ['vse_tip_srt' => 1], false],
+			['similartopics', [], ['vse_tip_pst' => 1], true],
+			['similartopics', [], ['vse_tip_pst' => 0], false],
 		];
 	}
 
 	/**
-	 * @dataProvider add_permissions_test_data
+	 * @dataProvider preview_events_data
 	 */
-	public function test_add_permissions($data, $expected)
+	public function test_preview_events($method, $data, $configs, $expected)
 	{
-		$event = new \phpbb\event\data([
-			'permissions'	=> $data
-		]);
+		$method_row = "{$method}_row";
+		$method_tpl = "{$method}_tpl";
 
-		$listener = $this->getEventListener();
+		foreach ($configs as $key => $value)
+		{
+			$this->config[$key] = $value;
+		}
 
-		$listener->add_permission($event);
+		/** @var \PHPUnit_Framework_MockObject_MockObject|\vse\topicimagepreview\factory $factory */
+		$factory = $this->getMockBuilder('\vse\topicimagepreview\factory')
+			->disableOriginalConstructor()
+			->getMock();
 
-		$this->assertSame($event['permissions'], $expected);
+		$factory->expects($expected ? $this->once() : $this->never())
+			->method('update_row_data');
+
+		$factory->expects($expected ? $this->atLeastOnce() : $this->never())
+			->method('update_tpl_data');
+
+		$event = new \phpbb\event\data($data);
+		$listener = new \vse\topicimagepreview\event\preview($this->config, $factory);
+		$this->assertNull($listener->$method_row($event));
+		$this->assertNull($listener->$method_tpl($event));
 	}
 }
