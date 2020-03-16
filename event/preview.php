@@ -40,14 +40,14 @@ class preview implements EventSubscriberInterface
 	{
 		return [
 			// Viewforum events
-			'core.viewforum_modify_topics_data'		=> 'update_row_data',
-			'core.viewforum_modify_topicrow'		=> 'update_tpl_data',
+			'core.viewforum_modify_topics_data'		=> 'viewforum_row',
+			'core.viewforum_modify_topicrow'		=> 'viewforum_tpl',
 			// Search events
-			'core.search_modify_rowset'				=> 'update_row_data',
-			'core.search_modify_tpl_ary'			=> 'update_tpl_data',
+			'core.search_modify_rowset'				=> 'searchresult_row',
+			'core.search_modify_tpl_ary'			=> 'searchresult_tpl',
 			// Precise Similar Topics events
-			'vse.similartopics.modify_rowset'		=> 'update_row_data',
-			'vse.similartopics.modify_topicrow'		=> 'update_tpl_data',
+			'vse.similartopics.modify_rowset'		=> 'similartopics_row',
+			'vse.similartopics.modify_topicrow'		=> 'similartopics_tpl',
 		];
 	}
 
@@ -67,7 +67,46 @@ class preview implements EventSubscriberInterface
 		$this->user = $user;
 	}
 
+	public function viewforum_row($event)
 	{
+		$this->update_row_data($event);
+	}
+
+	public function viewforum_tpl($event)
+	{
+		$this->update_tpl_data($event);
+	}
+
+	public function searchresult_row($event)
+	{
+		if ($event['show_results'] === 'topics' && $this->config->offsetGet('vse_tip_srt'))
+		{
+			$this->update_row_data($event);
+		}
+	}
+
+	public function searchresult_tpl($event)
+	{
+		if ($event['show_results'] === 'topics' && $this->config->offsetGet('vse_tip_srt'))
+		{
+			$this->update_tpl_data($event);
+		}
+	}
+
+	public function similartopics_row($event)
+	{
+		if ($this->config->offsetGet('vse_tip_pst'))
+		{
+			$this->update_row_data($event);
+		}
+	}
+
+	public function similartopics_tpl($event)
+	{
+		if ($this->config->offsetGet('vse_tip_pst'))
+		{
+			$this->update_tpl_data($event);
+		}
 	}
 
 	/**
@@ -77,7 +116,7 @@ class preview implements EventSubscriberInterface
 	 *
 	 * @return void
 	 */
-	public function update_row_data($event)
+	protected function update_row_data($event)
 	{
 		if (!$this->user_allowed())
 		{
@@ -100,7 +139,7 @@ class preview implements EventSubscriberInterface
 	 *
 	 * @return void
 	 */
-	public function update_tpl_data($event)
+	protected function update_tpl_data($event)
 	{
 		if (!$this->user_allowed() || !$this->forum_allowed($event['row']['forum_id']) || !$this->has_images($event))
 		{

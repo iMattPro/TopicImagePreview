@@ -28,4 +28,6 @@ $lang = array_merge($lang, [
 	'ACP_TIP_DISPLAY_NUM_EXPLAIN'	=> 'Maximum number of images to display in previews. Set to 0 to disable previews.',
 	'ACP_TIP_DISPLAY_DIM'			=> 'Maximum image size per preview',
 	'ACP_TIP_DISPLAY_DIM_EXPLAIN'	=> 'Maximum width/height of each image in the preview.',
+	'ACP_TIP_DISPLAY_SRT'			=> 'Display in search results topics',
+	'ACP_TIP_DISPLAY_PST'			=> 'Display in similar topics',
 ]);
