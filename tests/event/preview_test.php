@@ -57,8 +57,48 @@ class preview_test extends base
 
 		return [
 			[
+				// Check all topics, user does not allow images so results should be null
+				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 0, 'f_vse_tip' => 1],
+				null,
+				[
+					1 => [],
+					2 => [],
+					3 => [],
+				],
+				[
+					1 => null,
+					2 => null,
+					3 => null,
+				],
+				[
+					1 => null,
+					2 => null,
+					3 => null,
+				],
+			],
+			[
+				// Check all topics, forum does not allow images so results should be null
+				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 1, 'f_vse_tip' => 0],
+				null,
+				[
+					1 => [],
+					2 => [],
+					3 => [],
+				],
+				[
+					1 => null,
+					2 => null,
+					3 => null,
+				],
+				[
+					1 => null,
+					2 => null,
+					3 => null,
+				],
+			],
+			[
 				// Check all topics, topic 1 has an image, topic 2 has 2 images
-				['vse_tip_new' => 1, 'vse_tip_num' => 3],
+				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				null,
 				[
 					1 => [],
@@ -78,7 +118,7 @@ class preview_test extends base
 			],
 			[
 				// Check 1 topic, which contains 1 posted image
-				['vse_tip_new' => 1, 'vse_tip_num' => 3],
+				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				null,
 				[
 					1 => [],
@@ -92,7 +132,7 @@ class preview_test extends base
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, get up to 3 images from the newest post
-				['vse_tip_new' => 1, 'vse_tip_num' => 3],
+				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				[2, 3],
 				[
 					2 => [],
@@ -109,7 +149,7 @@ class preview_test extends base
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, get only show 1 image from the newest post
-				['vse_tip_new' => 1, 'vse_tip_num' => 1],
+				['vse_tip_new' => 1, 'vse_tip_num' => 1, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				[2, 3],
 				[
 					2 => [],
@@ -126,7 +166,7 @@ class preview_test extends base
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, but only show 1 image from the oldest post
-				['vse_tip_new' => 0, 'vse_tip_num' => 1],
+				['vse_tip_new' => 0, 'vse_tip_num' => 1, 'user_vse_tip' => 1, 'f_vse_tip' => 1],
 				[2, 3],
 				[
 					2 => [],
@@ -149,13 +189,23 @@ class preview_test extends base
 	 */
 	public function test_preview_events($configs, $topic_list, $rowset, $expected_row, $expected_img)
 	{
-		$this->auth->expects($this->atLeastOnce())
-			->method('acl_get')
-			->with($this->stringContains('_'), $this->anything())
-			->willReturnMap([['f_vse_tip', null, true]]);
-
 		foreach ($configs as $key => $config)
 		{
+			if ($key === 'f_vse_tip')
+			{
+				$this->auth->expects($configs['user_vse_tip'] ? $this->atLeastOnce() : $this->never())
+					->method('acl_get')
+					->with($key)
+					->willReturn($config);
+				continue;
+			}
+
+			if ($key === 'user_vse_tip')
+			{
+				$this->user->data['user_vse_tip'] = $config;
+				continue;
+			}
+
 			$this->config[$key] = $config;
 		}
 
@@ -189,15 +239,40 @@ class preview_test extends base
 		}
 	}
 
-	public function test_preview_disabled()
+	public function add_permissions_test_data()
 	{
+		return [
+			[
+				[],
+				[
+					'f_vse_tip' => ['lang' => 'ACL_F_VSE_TIP', 'cat' => 'actions'],
+				],
+			],
+			[
+				[
+					'a_foo' => ['lang' => 'ACL_A_FOO', 'cat' => 'misc'],
+				],
+				[
+					'a_foo' => ['lang' => 'ACL_A_FOO', 'cat' => 'misc'],
+					'f_vse_tip' => ['lang' => 'ACL_F_VSE_TIP', 'cat' => 'actions'],
+				],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider add_permissions_test_data
+	 */
+	public function test_add_permissions($data, $expected)
+	{
+		$event = new \phpbb\event\data([
+			'permissions'	=> $data
+		]);
+
 		$listener = $this->getEventListener();
 
-		$this->user->data['user_vse_tip'] = 0;
+		$listener->add_permission($event);
 
-		$event = new \phpbb\event\data();
-
-		$this->assertNull($listener->update_row_data($event));
-		$this->assertNull($listener->update_tpl_data($event));
+		$this->assertSame($event['permissions'], $expected);
 	}
 }
