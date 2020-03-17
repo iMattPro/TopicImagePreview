@@ -1,10 +1,17 @@
 services:
+    vse.topicimagepreview.factory:
+        class: vse\topicimagepreview\factory
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@dbal.conn'
+            - '@user'
+
     vse.topicimagepreview.preview:
         class: vse\topicimagepreview\event\preview
         arguments:
             - '@config'
-            - '@dbal.conn'
-            - '@user'
+            - '@vse.topicimagepreview.factory'
         tags:
             - { name: event.listener }
 

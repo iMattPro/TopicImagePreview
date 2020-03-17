@@ -12,6 +12,9 @@ namespace vse\topicimagepreview\tests\event;
 
 class base extends \phpbb_database_test_case
 {
+	/** @var \PHPUnit_Framework_MockObject_MockObject|\phpbb\auth\auth */
+	protected $auth;
+
 	/** @var \phpbb\config\config */
 	protected $config;
 
@@ -52,6 +55,9 @@ class base extends \phpbb_database_test_case
 			'vse_tip_dim' => 200,
 		]);
 		$this->db = $this->new_dbal();
+		$this->auth = $this->getMockBuilder('\phpbb\auth\auth')
+			->disableOriginalConstructor()
+			->getMock();
 		$this->language = new \phpbb\language\language(
 			new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx)
 		);

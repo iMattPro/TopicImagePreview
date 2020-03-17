@@ -31,6 +31,7 @@ class settings_test extends base
 	public function test_getSubscribedEvents()
 	{
 		$this->assertEquals([
+			'core.permissions',
 			'core.acp_board_config_edit_add',
 			'core.ucp_prefs_view_data',
 			'core.ucp_prefs_view_update_data',
@@ -43,7 +44,7 @@ class settings_test extends base
 			[ // expected config and mode
 			  'post',
 			  ['vars' => ['legend3' => []]],
-			  ['legend_vse_tip', 'vse_tip_new', 'vse_tip_num', 'vse_tip_dim', 'legend3'],
+			  ['legend_vse_tip', 'vse_tip_new', 'vse_tip_num', 'vse_tip_dim', 'vse_tip_srt', 'legend3'],
 			],
 			[ // unexpected mode
 			  'foobar',
@@ -273,5 +274,42 @@ class settings_test extends base
 		$result = $event->get_data_filtered($event_data);
 
 		$this->assertEquals($expected, $result['data']);
+	}
+
+	public function add_permissions_test_data()
+	{
+		return [
+			[
+				[],
+				[
+					'f_vse_tip' => ['lang' => 'ACL_F_VSE_TIP', 'cat' => 'actions'],
+				],
+			],
+			[
+				[
+					'a_foo' => ['lang' => 'ACL_A_FOO', 'cat' => 'misc'],
+				],
+				[
+					'a_foo' => ['lang' => 'ACL_A_FOO', 'cat' => 'misc'],
+					'f_vse_tip' => ['lang' => 'ACL_F_VSE_TIP', 'cat' => 'actions'],
+				],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider add_permissions_test_data
+	 */
+	public function test_add_permissions($data, $expected)
+	{
+		$event = new \phpbb\event\data([
+			'permissions'	=> $data
+		]);
+
+		$listener = $this->getEventListener();
+
+		$listener->add_permission($event);
+
+		$this->assertSame($event['permissions'], $expected);
 	}
 }

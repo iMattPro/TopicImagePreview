@@ -3,7 +3,7 @@
  *
  * Topic Image Preview. An extension for the phpBB Forum Software package.
  *
- * @copyright (c) 2017, Matt Friedman
+ * @copyright (c) 2017, 2020, Matt Friedman
  * @license GNU General Public License, version 2 (GPL-2.0)
  *
  */
@@ -43,6 +43,8 @@ class settings implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
+			// Global events
+			'core.permissions'						=> 'add_permission',
 			// ACP events
 			'core.acp_board_config_edit_add'		=> 'update_acp_data',
 			// UCP events
@@ -70,6 +72,20 @@ class settings implements EventSubscriberInterface
 	}
 
 	/**
+	 * Add administrative permissions to manage forums
+	 *
+	 * @param \phpbb\event\data $event The event object
+	 * @return void
+	 */
+	public function add_permission($event)
+	{
+		$event->update_subarray('permissions', 'f_vse_tip', [
+			'lang' => 'ACL_F_VSE_TIP',
+			'cat'  => 'actions',
+		]);
+	}
+
+	/**
 	 * Add ACP config options to Post settings.
 	 *
 	 * @param \phpbb\event\data $event The event object
@@ -87,7 +103,14 @@ class settings implements EventSubscriberInterface
 				'vse_tip_new'		=> ['lang' => 'ACP_TIP_DISPLAY_AGE', 'validate' => 'bool', 'type' => 'custom', 'function' => [$this, 'select_vse_tip_new'], 'explain' => true],
 				'vse_tip_num'		=> ['lang' => 'ACP_TIP_DISPLAY_NUM', 'validate' => 'int:0:99', 'type' => 'number:0:99', 'explain' => true],
 				'vse_tip_dim'		=> ['lang' => 'ACP_TIP_DISPLAY_DIM', 'validate' => 'int:0:999', 'type' => 'number:0:999', 'explain' => true, 'append' => ' ' . $this->language->lang('PIXEL')],
+				'vse_tip_srt'		=> ['lang' => 'ACP_TIP_DISPLAY_SRT', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false],
 			];
+
+			// Add an option to display in Precise Similar Topics if it is installed
+			if ($this->config->offsetExists('similar_topics'))
+			{
+				$my_config_vars['vse_tip_pst'] = ['lang' => 'ACP_TIP_DISPLAY_PST', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false];
+			}
 
 			$event->update_subarray('display_vars', 'vars', phpbb_insert_config_array($event['display_vars']['vars'], $my_config_vars, ['before' => 'legend3']));
 		}
