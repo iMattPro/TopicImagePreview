@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0-RC2 - 2020-03-17
+
+- Added forum-based permissions to control which groups and forums can see image previews.
+- Added options to enable/disable image previews in search results and Precise Similar Topics.
+
+## 1.0.0-RC1 - 2019-11-22
+
+- Renamed the entire extension project using all lowercase letters instead of snake-case because it's the rules with Composer package names and Packagist.
+
 ## 1.0.0-b5 - 2019-06-19
 
 - Added a UCP display preference so users can disable image previews.
