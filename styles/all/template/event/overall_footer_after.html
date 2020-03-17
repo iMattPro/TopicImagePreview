@@ -1,4 +1,7 @@
-{% INCLUDEJS '@vse_topicimagepreview/js/opentip-jquery.min.js' %}
+{% if not definition.INCLUDED_OPENTIPJS %}
+	{% INCLUDEJS '@vse_topicimagepreview/js/opentip-jquery.min.js' %}
+	{% DEFINE INCLUDED_OPENTIPJS = true %}
+{% endif %}
 
 <script>
 	$(function() {
