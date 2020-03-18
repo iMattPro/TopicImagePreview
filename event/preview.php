@@ -12,7 +12,6 @@ namespace vse\topicimagepreview\event;
 
 use phpbb\config\config;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use vse\topicimagepreview\factory;
 
 /**
  * Topic Image Preview Event listener.
@@ -22,7 +21,7 @@ class preview implements EventSubscriberInterface
 	/** @var config */
 	protected $config;
 
-	/** @var factory */
+	/** @var helper */
 	private $factory;
 
 	/**
@@ -46,13 +45,13 @@ class preview implements EventSubscriberInterface
 	/**
 	 * Constructor
 	 *
-	 * @param config  $config
-	 * @param factory $factory
+	 * @param config $config
+	 * @param helper $helper
 	 */
-	public function __construct(config $config, factory $factory)
+	public function __construct(config $config, helper $helper)
 	{
 		$this->config = $config;
-		$this->factory = $factory;
+		$this->factory = $helper;
 	}
 
 	/**

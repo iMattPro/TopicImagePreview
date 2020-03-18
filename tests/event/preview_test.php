@@ -16,7 +16,7 @@ class preview_test extends base
 	{
 		return new \vse\topicimagepreview\event\preview(
 			$this->config,
-			new \vse\topicimagepreview\factory(
+			new \vse\topicimagepreview\event\helper(
 				$this->auth,
 				$this->config,
 				$this->db,
@@ -197,8 +197,8 @@ class preview_test extends base
 			$this->config[$key] = $value;
 		}
 
-		/** @var \PHPUnit_Framework_MockObject_MockObject|\vse\topicimagepreview\factory $factory */
-		$factory = $this->getMockBuilder('\vse\topicimagepreview\factory')
+		/** @var \PHPUnit_Framework_MockObject_MockObject|\vse\topicimagepreview\event\helper $factory */
+		$factory = $this->getMockBuilder('\vse\topicimagepreview\event\helper')
 			->disableOriginalConstructor()
 			->getMock();
 
