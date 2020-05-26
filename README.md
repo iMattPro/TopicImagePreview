@@ -7,4 +7,4 @@ A phpBB extension. Display thumbnail previews of images in a topic when hovering
 
 ## License
 
-[GPLv2](license.txt)
+[GNU General Public License v2](license.txt)
