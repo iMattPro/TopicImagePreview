@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-RC3 - 2020-06-10
+
+- Refactored code into a helper class
+
 ## 1.0.0-RC2 - 2020-03-17
 
 - Added forum-based permissions to control which groups and forums can see image previews.
