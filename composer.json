@@ -2,13 +2,13 @@
     "name": "vse/topicimagepreview",
     "type": "phpbb-extension",
     "description": "Display thumbnail previews of images in a topic when hovering the mouse over the topic.",
-    "homepage": "https://github.com/VSEphpbb/TopicImagePreview",
-    "version": "1.0.0-RC2",
+    "homepage": "https://github.com/iMattPro/TopicImagePreview",
+    "version": "1.0.0-RC3",
 	"license": "GPL-2.0-only",
     "authors": [
         {
 			"name": "Matt Friedman",
-			"homepage": "http://vsephpbb.github.io",
+			"homepage": "https://imattpro.github.io",
 			"role": "Developer"
         }
     ],

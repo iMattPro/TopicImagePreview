@@ -8,7 +8,7 @@
  *
  */
 
-namespace vse\topicimagepreview;
+namespace vse\topicimagepreview\event;
 
 use phpbb\auth\auth;
 use phpbb\config\config;
@@ -18,7 +18,7 @@ use phpbb\user;
 /**
  * Topic Image Preview Factory.
  */
-class factory
+class helper
 {
 	/** @var auth */
 	protected $auth;
@@ -80,7 +80,7 @@ class factory
 	 */
 	public function update_tpl_data($event)
 	{
-		if (!$this->user_allowed() || !$this->forum_allowed($event['row']['forum_id']) || !$this->has_images($event))
+		if (empty($event['row']['post_text']) || !$this->user_allowed() || !$this->forum_allowed($event['row']['forum_id']))
 		{
 			return;
 		}
@@ -104,6 +104,8 @@ class factory
 	protected function query_images(array $topic_list, array $rowset)
 	{
 		$sql_array = [];
+		$direction = $this->config->offsetGet('vse_tip_new') ? 'DESC' : 'ASC';
+		$like_expression = $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char());
 		foreach ($topic_list as $topic_id)
 		{
 			if (!$this->forum_allowed($rowset[$topic_id]['forum_id']))
@@ -115,8 +117,8 @@ class factory
 				FROM ' . POSTS_TABLE . '
 				WHERE topic_id = ' . (int) $topic_id . '
 					AND post_visibility = ' . ITEM_APPROVED . '
-					AND post_text ' . $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char()) . '
-				ORDER BY post_time ' . ($this->config->offsetGet('vse_tip_new') ? 'DESC' : 'ASC') . '
+					AND post_text ' . $like_expression . '
+				ORDER BY post_time ' . $direction . '
 				LIMIT 1)';
 
 			// SQLite3 doesn't like ORDER BY with UNION ALL, so treat $stmt as derived table
@@ -186,16 +188,5 @@ class factory
 	protected function user_allowed()
 	{
 		return (bool) $this->user->data['user_vse_tip'];
-	}
-
-	/**
-	 * Check if we have post with images
-	 *
-	 * @param \phpbb\event\data $event The event object
-	 * @return bool True if images found in post text, false if not
-	 */
-	protected function has_images($event)
-	{
-		return !empty($event['row']['post_text']) && preg_match('/^<[r][ >]/', $event['row']['post_text']) && strpos($event['row']['post_text'], '<IMG ') !== false;
 	}
 }

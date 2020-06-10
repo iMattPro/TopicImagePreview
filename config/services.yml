@@ -1,6 +1,6 @@
 services:
-    vse.topicimagepreview.factory:
-        class: vse\topicimagepreview\factory
+    vse.topicimagepreview.helper:
+        class: vse\topicimagepreview\event\helper
         arguments:
             - '@auth'
             - '@config'
@@ -11,7 +11,7 @@ services:
         class: vse\topicimagepreview\event\preview
         arguments:
             - '@config'
-            - '@vse.topicimagepreview.factory'
+            - '@vse.topicimagepreview.helper'
         tags:
             - { name: event.listener }
 
