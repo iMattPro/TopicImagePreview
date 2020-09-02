@@ -22,7 +22,7 @@ class preview implements EventSubscriberInterface
 	protected $config;
 
 	/** @var helper */
-	private $factory;
+	protected $helper;
 
 	/**
 	 * {@inheritdoc}
@@ -51,7 +51,7 @@ class preview implements EventSubscriberInterface
 	public function __construct(config $config, helper $helper)
 	{
 		$this->config = $config;
-		$this->factory = $helper;
+		$this->helper = $helper;
 	}
 
 	/**
@@ -61,7 +61,7 @@ class preview implements EventSubscriberInterface
 	 */
 	public function viewforum_row($event)
 	{
-		$this->factory->update_row_data($event);
+		$this->helper->update_row_data($event);
 	}
 
 	/**
@@ -71,7 +71,7 @@ class preview implements EventSubscriberInterface
 	 */
 	public function viewforum_tpl($event)
 	{
-		$this->factory->update_tpl_data($event);
+		$this->helper->update_tpl_data($event);
 	}
 
 	/**
@@ -83,7 +83,7 @@ class preview implements EventSubscriberInterface
 	{
 		if ($event['show_results'] === 'topics' && $this->config->offsetGet('vse_tip_srt'))
 		{
-			$this->factory->update_row_data($event);
+			$this->helper->update_row_data($event);
 		}
 	}
 
@@ -96,7 +96,7 @@ class preview implements EventSubscriberInterface
 	{
 		if ($event['show_results'] === 'topics' && $this->config->offsetGet('vse_tip_srt'))
 		{
-			$this->factory->update_tpl_data($event);
+			$this->helper->update_tpl_data($event);
 		}
 	}
 
@@ -109,7 +109,7 @@ class preview implements EventSubscriberInterface
 	{
 		if ($this->config->offsetGet('vse_tip_pst'))
 		{
-			$this->factory->update_row_data($event);
+			$this->helper->update_row_data($event);
 		}
 	}
 
@@ -122,7 +122,7 @@ class preview implements EventSubscriberInterface
 	{
 		if ($this->config->offsetGet('vse_tip_pst'))
 		{
-			$this->factory->update_tpl_data($event);
+			$this->helper->update_tpl_data($event);
 		}
 	}
 }
