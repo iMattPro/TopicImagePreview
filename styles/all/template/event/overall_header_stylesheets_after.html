@@ -1,5 +1,7 @@
+{% if S_VIEWFORUM or (S_IN_SEARCH and S_SHOW_TOPICS) or L_SIMILAR_TOPICS %}
 {% INCLUDECSS '@vse_topicimagepreview/opentip.css' %}
 
 <style>
 	.opentip-container { max-width: 1000px; white-space: nowrap; }
 </style>
+{% endif %}
