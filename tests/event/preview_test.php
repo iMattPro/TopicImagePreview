@@ -21,7 +21,8 @@ class preview_test extends base
 				$this->config,
 				$this->db,
 				$this->user
-			)
+			),
+			$this->template
 		);
 	}
 
@@ -33,6 +34,7 @@ class preview_test extends base
 	public function test_getSubscribedEvents()
 	{
 		$this->assertEquals([
+			'core.page_footer',
 			'core.viewforum_modify_topics_data',
 			'core.viewforum_modify_topicrow',
 			'core.search_modify_rowset',
@@ -40,6 +42,20 @@ class preview_test extends base
 			'vse.similartopics.modify_rowset',
 			'vse.similartopics.modify_topicrow',
 		], array_keys(\vse\topicimagepreview\event\preview::getSubscribedEvents()));
+	}
+
+	public function test_init_tpl_vars()
+	{
+		$this->template->expects(self::once())
+			->method('assign_vars')
+			->with([
+				'S_TOPIC_IMAGE_PREVIEW'		=> false,
+				'TOPIC_IMAGE_PREVIEW_DIM'	=> $this->config['vse_tip_dim'],
+			]);
+
+		$listener = $this->getEventListener();
+
+		$listener->init_tpl_vars();
 	}
 
 	public function preview_factory_test_data()
@@ -51,10 +67,10 @@ class preview_test extends base
 		];
 
 		$image = [
-			1 => "<img src='http://localhost/img1.gif' alt='' style='max-width:200px; max-height:200px;' />",
-			2 => "<img src='http://localhost/img2.gif' alt='' style='max-width:200px; max-height:200px;' />",
-			3 => "<img src='http://localhost/img3.gif' alt='' style='max-width:200px; max-height:200px;' />",
-			4 => "<img src='http://localhost/img4.gif' alt='' style='max-width:200px; max-height:200px;' />",
+			1 => "<img src='http://localhost/img1.gif' alt=''>",
+			2 => "<img src='http://localhost/img2.gif' alt=''>",
+			3 => "<img src='http://localhost/img3.gif' alt=''>",
+			4 => "<img src='http://localhost/img4.gif' alt=''>",
 		];
 
 		return [

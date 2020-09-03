@@ -11,6 +11,7 @@
 namespace vse\topicimagepreview\event;
 
 use phpbb\config\config;
+use phpbb\template\template;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -24,12 +25,16 @@ class preview implements EventSubscriberInterface
 	/** @var helper */
 	protected $helper;
 
+	/** @var template */
+	protected $template;
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public static function getSubscribedEvents()
 	{
 		return [
+			'core.page_footer'						=> 'init_tpl_vars',
 			// Viewforum events
 			'core.viewforum_modify_topics_data'		=> 'viewforum_row',
 			'core.viewforum_modify_topicrow'		=> 'viewforum_tpl',
@@ -48,10 +53,22 @@ class preview implements EventSubscriberInterface
 	 * @param config $config
 	 * @param helper $helper
 	 */
-	public function __construct(config $config, helper $helper)
+	public function __construct(config $config, helper $helper, template $template)
 	{
 		$this->config = $config;
 		$this->helper = $helper;
+		$this->template = $template;
+	}
+
+	/**
+	 * Set some template variables for T.I.P.
+	 */
+	public function init_tpl_vars()
+	{
+		$this->template->assign_vars([
+			'S_TOPIC_IMAGE_PREVIEW'		=> $this->helper->is_preview(),
+			'TOPIC_IMAGE_PREVIEW_DIM'	=> $this->config['vse_tip_dim'],
+		]);
 	}
 
 	/**

@@ -32,6 +32,9 @@ class helper
 	/** @var user */
 	protected $user;
 
+	/** @var bool */
+	protected $preview = false;
+
 	/**
 	 * Constructor
 	 *
@@ -46,6 +49,16 @@ class helper
 		$this->config = $config;
 		$this->db = $db;
 		$this->user = $user;
+	}
+
+	/**
+	 * Get the value of the in_preview
+	 *
+	 * @return bool True if topic image previews are generated.
+	 */
+	public function is_preview()
+	{
+		return $this->preview;
 	}
 
 	/**
@@ -88,6 +101,8 @@ class helper
 		// Send the image string to the template
 		$block = $event->offsetExists('topic_row') ? 'topic_row' : 'tpl_ary';
 		$event[$block] = array_merge($event[$block], ['TOPIC_IMAGES' => $this->extract_images($event['row']['post_text'])]);
+
+		$this->preview = true;
 	}
 
 	/**
@@ -165,7 +180,7 @@ class helper
 
 		// Create a string of images
 		return implode(' ', array_map(function ($image) {
-			return "<img src='{$image}' alt='' style='max-width:{$this->config['vse_tip_dim']}px; max-height:{$this->config['vse_tip_dim']}px;' />";
+			return "<img src='{$image}' alt=''>";
 		}, array_slice($images, 0, (int) $this->config['vse_tip_num'], true)));
 	}
 
