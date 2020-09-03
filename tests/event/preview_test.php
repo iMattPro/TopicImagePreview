@@ -28,12 +28,12 @@ class preview_test extends base
 
 	public function test_construct()
 	{
-		$this->assertInstanceOf('\Symfony\Component\EventDispatcher\EventSubscriberInterface', $this->getEventListener());
+		self::assertInstanceOf('\Symfony\Component\EventDispatcher\EventSubscriberInterface', $this->getEventListener());
 	}
 
 	public function test_getSubscribedEvents()
 	{
-		$this->assertEquals([
+		self::assertEquals([
 			'core.page_footer',
 			'core.viewforum_modify_topics_data',
 			'core.viewforum_modify_topicrow',
@@ -142,7 +142,7 @@ class preview_test extends base
 		{
 			if ($key === 'f_vse_tip')
 			{
-				$this->auth->expects($configs['user_vse_tip'] ? $this->atLeastOnce() : $this->never())
+				$this->auth->expects($configs['user_vse_tip'] ? self::atLeastOnce() : self::never())
 					->method('acl_get')
 					->with($key)
 					->willReturn($config);
@@ -170,7 +170,7 @@ class preview_test extends base
 
 		foreach ($event_data['rowset'] as $topic_id => $topic_data)
 		{
-			$this->assertEquals($expected_row[$topic_id], $topic_data['post_text']);
+			self::assertEquals($expected_row[$topic_id], $topic_data['post_text']);
 
 			// Test the update_tpl_data event
 			$row = $topic_data;
@@ -184,7 +184,7 @@ class preview_test extends base
 			$event_data = $event->get_data_filtered($event_data);
 			$topic_row = $event_data['topic_row'];
 
-			$this->assertEquals($expected_img[$topic_id], $topic_row['TOPIC_IMAGES']);
+			self::assertEquals($expected_img[$topic_id], $topic_row['TOPIC_IMAGES']);
 		}
 	}
 
@@ -213,20 +213,20 @@ class preview_test extends base
 			$this->config[$key] = $value;
 		}
 
-		/** @var \PHPUnit_Framework_MockObject_MockObject|\vse\topicimagepreview\event\helper $factory */
-		$factory = $this->getMockBuilder('\vse\topicimagepreview\event\helper')
+		/** @var \PHPUnit_Framework_MockObject_MockObject|\vse\topicimagepreview\event\helper $helper */
+		$helper = $this->getMockBuilder('\vse\topicimagepreview\event\helper')
 			->disableOriginalConstructor()
 			->getMock();
 
-		$factory->expects($expected ? $this->once() : $this->never())
+		$helper->expects($expected ? self::once() : self::never())
 			->method('update_row_data');
 
-		$factory->expects($expected ? $this->atLeastOnce() : $this->never())
+		$helper->expects($expected ? self::atLeastOnce() : self::never())
 			->method('update_tpl_data');
 
 		$event = new \phpbb\event\data($data);
-		$listener = new \vse\topicimagepreview\event\preview($this->config, $factory);
-		$this->assertNull($listener->$method_row($event));
-		$this->assertNull($listener->$method_tpl($event));
+		$listener = new \vse\topicimagepreview\event\preview($this->config, $helper, $this->template);
+		self::assertNull($listener->$method_row($event));
+		self::assertNull($listener->$method_tpl($event));
 	}
 }

@@ -48,7 +48,7 @@ class acp_test extends \phpbb_functional_test_case
 
 		if (!$found)
 		{
-			$this->fail('Topic Image Preview settings were not found in the expected ACP location.');
+			self::fail('Topic Image Preview settings were not found in the expected ACP location.');
 		}
 	}
 }
