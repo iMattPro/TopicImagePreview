@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Display thumbnail previews of images in a topic when hovering the mouse over the topic.",
     "homepage": "https://github.com/iMattPro/TopicImagePreview",
-    "version": "1.0.0",
+    "version": "1.0.1-dev",
 	"license": "GPL-2.0-only",
     "authors": [
         {
