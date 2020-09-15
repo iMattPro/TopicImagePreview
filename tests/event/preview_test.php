@@ -60,17 +60,18 @@ class preview_test extends base
 
 	public function preview_factory_test_data()
 	{
+
+		$image = [
+			1 => 'http://localhost/img1.gif',
+			2 => 'http://localhost/img2.gif',
+			3 => 'http://localhost/img3.gif',
+			4 => 'http://localhost/img4.gif',
+		];
+
 		$post = [
 			2 => '<r><IMG src="http://localhost/img1.gif"><s>[img]</s><URL url="http://localhost/img1.gif">http://localhost/img1.gif</URL><e>[/img]</e></IMG></r>',
 			4 => '<r><IMG src="http://localhost/img2.gif"><s>[img]</s><URL url="http://localhost/img2.gif">http://localhost/img2.gif</URL><e>[/img]</e></IMG></r>',
 			5 => '<r><IMG src="http://localhost/img3.gif"><s>[img]</s><URL url="http://localhost/img3.gif">http://localhost/img3.gif</URL><e>[/img]</e></IMG><IMG src="http://localhost/img4.gif"><s>[img]</s><URL url="http://localhost/img4.gif">http://localhost/img4.gif</URL><e>[/img]</e></IMG></r>',
-		];
-
-		$image = [
-			1 => "<img src='http://localhost/img1.gif' alt=''>",
-			2 => "<img src='http://localhost/img2.gif' alt=''>",
-			3 => "<img src='http://localhost/img3.gif' alt=''>",
-			4 => "<img src='http://localhost/img4.gif' alt=''>",
 		];
 
 		return [
@@ -96,7 +97,7 @@ class preview_test extends base
 				null,
 				[1 => [], 2 => [], 3 => []],
 				[1 => $post[2], 2 => $post[5], 3 => null],
-				[1 => $image[1], 2 => "$image[3] $image[4]", 3 => null],
+				[1 => [$image[1]], 2 => [$image[3], $image[4]], 3 => null],
 			],
 			[
 				// Check 1 topic, which contains 1 posted image
@@ -104,7 +105,7 @@ class preview_test extends base
 				null,
 				[1 => []],
 				[1 => $post[2]],
-				[1 => $image[1]],
+				[1 => [$image[1]]],
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, get up to 3 images from the newest post
@@ -112,7 +113,7 @@ class preview_test extends base
 				[2, 3],
 				[2 => [], 3 => []],
 				[2 => $post[5], 3 => null],
-				[2 => "$image[3] $image[4]", 3 => null],
+				[2 => [$image[3], $image[4]], 3 => null],
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, get only show 1 image from the newest post
@@ -120,7 +121,7 @@ class preview_test extends base
 				[2, 3],
 				[2 => [], 3 => []],
 				[2 => $post[5], 3 => null],
-				[2 => (string) $image[3], 3 => null],
+				[2 => [$image[3]], 3 => null],
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, but only show 1 image from the oldest post
@@ -128,7 +129,7 @@ class preview_test extends base
 				[2, 3],
 				[2 => [], 3 => []],
 				[2 => $post[4], 3 => null],
-				[2 => (string) $image[2], 3 => null],
+				[2 => [$image[2]], 3 => null],
 			],
 		];
 	}

@@ -160,11 +160,11 @@ class helper
 	}
 
 	/**
-	 * Extract images from a post and return them as HTML image tags.
+	 * Extract images from a post and return them as an array of images.
 	 *
 	 * @param string $post Post text from the database.
 	 *
-	 * @return string An string of HTML IMG tags.
+	 * @return array An array of images.
 	 */
 	protected function extract_images($post)
 	{
@@ -178,10 +178,7 @@ class helper
 			$images[] = $image->textContent;
 		}
 
-		// Create a string of images
-		return implode(' ', array_map(function ($image) {
-			return "<img src='{$image}' alt=''>";
-		}, array_slice($images, 0, (int) $this->config['vse_tip_num'], true)));
+		return array_slice($images, 0, (int) $this->config['vse_tip_num'], true);
 	}
 
 	/**
