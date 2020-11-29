@@ -94,11 +94,6 @@ class settings_test extends base
 	{
 		return [
 			[
-				[],
-				[],
-				['user_vse_tip' => 0],
-			],
-			[
 				['user_vse_tip' => 1],
 				[],
 				['user_vse_tip' => 1],

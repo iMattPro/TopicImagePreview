@@ -79,7 +79,7 @@ class preview_test extends base
 				// Check all topics, user does not allow images so results should be null
 				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 0, 'f_vse_tip' => 1],
 				null,
-				[1 => [], 2 => [], 3 => [],],
+				[1 => [], 2 => [], 3 => []],
 				[1 => null, 2 => null, 3 => null,],
 				[1 => null, 2 => null, 3 => null],
 			],
@@ -159,6 +159,12 @@ class preview_test extends base
 			$this->config[$key] = $config;
 		}
 
+		// Add a forum_id to rowsets
+		foreach ($rowset as $id => $row)
+		{
+			$rowset[$id]['forum_id'] = 2;
+		}
+
 		$listener = $this->getEventListener();
 
 		// Test the update_row_data event
@@ -171,7 +177,10 @@ class preview_test extends base
 
 		foreach ($event_data['rowset'] as $topic_id => $topic_data)
 		{
-			self::assertEquals($expected_row[$topic_id], $topic_data['post_text']);
+			if ($expected_row[$topic_id] !== null)
+			{
+				self::assertEquals($expected_row[$topic_id], $topic_data['post_text']);
+			}
 
 			// Test the update_tpl_data event
 			$row = $topic_data;
@@ -185,7 +194,10 @@ class preview_test extends base
 			$event_data = $event->get_data_filtered($event_data);
 			$topic_row = $event_data['topic_row'];
 
-			self::assertEquals($expected_img[$topic_id], $topic_row['TOPIC_IMAGES']);
+			if ($expected_img[$topic_id] !== null)
+			{
+				self::assertEquals($expected_img[$topic_id], $topic_row['TOPIC_IMAGES']);
+			}
 		}
 	}
 
