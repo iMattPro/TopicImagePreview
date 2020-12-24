@@ -121,6 +121,8 @@ class helper
 		$sql_array = [];
 		$direction = $this->config->offsetGet('vse_tip_new') ? 'DESC' : 'ASC';
 		$like_expression = $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char());
+		$is_sqlite3 = $this->db->get_sql_layer() === 'sqlite3';
+		$is_mssql = strpos($this->db->get_sql_layer(), 'mssql') === 0;
 		foreach ($topic_list as $topic_id)
 		{
 			if (!$this->forum_allowed($rowset[$topic_id]['forum_id']))
@@ -128,16 +130,15 @@ class helper
 				continue;
 			}
 
-			$stmt = '(SELECT topic_id, post_text
+			$stmt = '(SELECT ' . ($is_mssql ? 'TOP 1 ' : '') . 'topic_id, post_text
 				FROM ' . POSTS_TABLE . '
 				WHERE topic_id = ' . (int) $topic_id . '
 					AND post_visibility = ' . ITEM_APPROVED . '
 					AND post_text ' . $like_expression . '
-				ORDER BY post_time ' . $direction . '
-				LIMIT 1)';
+				ORDER BY post_time ' . $direction . ($is_mssql ? '' : ' LIMIT 1') . ')';
 
-			// SQLite3 doesn't like ORDER BY with UNION ALL, so treat $stmt as derived table
-			if ($this->db->get_sql_layer() === 'sqlite3')
+			// SQLite3 and mssql don't like ORDER BY with UNION ALL, so treat $stmt as derived table
+			if ($is_sqlite3 || $is_mssql)
 			{
 				$stmt = "SELECT * FROM $stmt AS d";
 			}
