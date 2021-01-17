@@ -1,5 +1,14 @@
-{% INCLUDECSS '@vse_topicimagepreview/opentip.css' %}
-
-<style>
-	.opentip-container { max-width: 1000px; white-space: nowrap; }
-</style>
+{% if S_TOPIC_IMAGE_PREVIEW %}
+	{% INCLUDECSS '@vse_topicimagepreview/opentip.css' %}
+	<style>
+		.opentip-container {
+			max-width: 1000px;
+			white-space: nowrap;
+		}
+		.ot-content > img {
+			max-width: {{ TOPIC_IMAGE_PREVIEW_DIM }}px;
+			max-height: {{ TOPIC_IMAGE_PREVIEW_DIM }}px;
+			vertical-align: top;
+		}
+	</style>
+{% endif %}

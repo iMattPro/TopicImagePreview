@@ -12,6 +12,7 @@ services:
         arguments:
             - '@config'
             - '@vse.topicimagepreview.helper'
+            - '@template'
         tags:
             - { name: event.listener }
 

@@ -32,6 +32,9 @@ class helper
 	/** @var user */
 	protected $user;
 
+	/** @var bool */
+	protected $preview = false;
+
 	/**
 	 * Constructor
 	 *
@@ -46,6 +49,16 @@ class helper
 		$this->config = $config;
 		$this->db = $db;
 		$this->user = $user;
+	}
+
+	/**
+	 * Get the value of the in_preview
+	 *
+	 * @return bool True if topic image previews are generated.
+	 */
+	public function is_preview()
+	{
+		return $this->preview;
 	}
 
 	/**
@@ -88,6 +101,8 @@ class helper
 		// Send the image string to the template
 		$block = $event->offsetExists('topic_row') ? 'topic_row' : 'tpl_ary';
 		$event[$block] = array_merge($event[$block], ['TOPIC_IMAGES' => $this->extract_images($event['row']['post_text'])]);
+
+		$this->preview = true;
 	}
 
 	/**
@@ -106,6 +121,8 @@ class helper
 		$sql_array = [];
 		$direction = $this->config->offsetGet('vse_tip_new') ? 'DESC' : 'ASC';
 		$like_expression = $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char());
+		$is_sqlite3 = $this->db->get_sql_layer() === 'sqlite3';
+		$is_mssql = strpos($this->db->get_sql_layer(), 'mssql') === 0;
 		foreach ($topic_list as $topic_id)
 		{
 			if (!$this->forum_allowed($rowset[$topic_id]['forum_id']))
@@ -113,16 +130,15 @@ class helper
 				continue;
 			}
 
-			$stmt = '(SELECT topic_id, post_text
+			$stmt = '(SELECT ' . ($is_mssql ? 'TOP 1 ' : '') . 'topic_id, post_text
 				FROM ' . POSTS_TABLE . '
 				WHERE topic_id = ' . (int) $topic_id . '
 					AND post_visibility = ' . ITEM_APPROVED . '
 					AND post_text ' . $like_expression . '
-				ORDER BY post_time ' . $direction . '
-				LIMIT 1)';
+				ORDER BY post_time ' . $direction . ($is_mssql ? '' : ' LIMIT 1') . ')';
 
-			// SQLite3 doesn't like ORDER BY with UNION ALL, so treat $stmt as derived table
-			if ($this->db->get_sql_layer() === 'sqlite3')
+			// SQLite3 and mssql don't like ORDER BY with UNION ALL, so treat $stmt as derived table
+			if ($is_sqlite3 || $is_mssql)
 			{
 				$stmt = "SELECT * FROM $stmt AS d";
 			}
@@ -145,11 +161,11 @@ class helper
 	}
 
 	/**
-	 * Extract images from a post and return them as HTML image tags.
+	 * Extract images from a post and return them as an array of images.
 	 *
 	 * @param string $post Post text from the database.
 	 *
-	 * @return string An string of HTML IMG tags.
+	 * @return array An array of images.
 	 */
 	protected function extract_images($post)
 	{
@@ -163,10 +179,7 @@ class helper
 			$images[] = $image->textContent;
 		}
 
-		// Create a string of images
-		return implode(' ', array_map(function ($image) {
-			return "<img src='{$image}' alt='' style='max-width:{$this->config['vse_tip_dim']}px; max-height:{$this->config['vse_tip_dim']}px;' />";
-		}, array_slice($images, 0, (int) $this->config['vse_tip_num'], true)));
+		return array_slice($images, 0, (int) $this->config['vse_tip_num'], true);
 	}
 
 	/**

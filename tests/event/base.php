@@ -43,7 +43,7 @@ class base extends \phpbb_database_test_case
 		return $this->createXMLDataSet(__DIR__ . '/fixtures/posts.xml');
 	}
 
-	public function setUp(): void
+	protected function setUp(): void
 	{
 		global $phpbb_root_path, $phpEx;
 

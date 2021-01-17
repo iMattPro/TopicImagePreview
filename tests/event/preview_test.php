@@ -21,18 +21,20 @@ class preview_test extends base
 				$this->config,
 				$this->db,
 				$this->user
-			)
+			),
+			$this->template
 		);
 	}
 
 	public function test_construct()
 	{
-		$this->assertInstanceOf('\Symfony\Component\EventDispatcher\EventSubscriberInterface', $this->getEventListener());
+		self::assertInstanceOf('\Symfony\Component\EventDispatcher\EventSubscriberInterface', $this->getEventListener());
 	}
 
 	public function test_getSubscribedEvents()
 	{
-		$this->assertEquals([
+		self::assertEquals([
+			'core.page_footer',
 			'core.viewforum_modify_topics_data',
 			'core.viewforum_modify_topicrow',
 			'core.search_modify_rowset',
@@ -42,19 +44,34 @@ class preview_test extends base
 		], array_keys(\vse\topicimagepreview\event\preview::getSubscribedEvents()));
 	}
 
+	public function test_init_tpl_vars()
+	{
+		$this->template->expects(self::once())
+			->method('assign_vars')
+			->with([
+				'S_TOPIC_IMAGE_PREVIEW'		=> false,
+				'TOPIC_IMAGE_PREVIEW_DIM'	=> $this->config['vse_tip_dim'],
+			]);
+
+		$listener = $this->getEventListener();
+
+		$listener->init_tpl_vars();
+	}
+
 	public function preview_factory_test_data()
 	{
+
+		$image = [
+			1 => 'http://localhost/img1.gif',
+			2 => 'http://localhost/img2.gif',
+			3 => 'http://localhost/img3.gif',
+			4 => 'http://localhost/img4.gif',
+		];
+
 		$post = [
 			2 => '<r><IMG src="http://localhost/img1.gif"><s>[img]</s><URL url="http://localhost/img1.gif">http://localhost/img1.gif</URL><e>[/img]</e></IMG></r>',
 			4 => '<r><IMG src="http://localhost/img2.gif"><s>[img]</s><URL url="http://localhost/img2.gif">http://localhost/img2.gif</URL><e>[/img]</e></IMG></r>',
 			5 => '<r><IMG src="http://localhost/img3.gif"><s>[img]</s><URL url="http://localhost/img3.gif">http://localhost/img3.gif</URL><e>[/img]</e></IMG><IMG src="http://localhost/img4.gif"><s>[img]</s><URL url="http://localhost/img4.gif">http://localhost/img4.gif</URL><e>[/img]</e></IMG></r>',
-		];
-
-		$image = [
-			1 => "<img src='http://localhost/img1.gif' alt='' style='max-width:200px; max-height:200px;' />",
-			2 => "<img src='http://localhost/img2.gif' alt='' style='max-width:200px; max-height:200px;' />",
-			3 => "<img src='http://localhost/img3.gif' alt='' style='max-width:200px; max-height:200px;' />",
-			4 => "<img src='http://localhost/img4.gif' alt='' style='max-width:200px; max-height:200px;' />",
 		];
 
 		return [
@@ -62,7 +79,7 @@ class preview_test extends base
 				// Check all topics, user does not allow images so results should be null
 				['vse_tip_new' => 1, 'vse_tip_num' => 3, 'user_vse_tip' => 0, 'f_vse_tip' => 1],
 				null,
-				[1 => [], 2 => [], 3 => [],],
+				[1 => [], 2 => [], 3 => []],
 				[1 => null, 2 => null, 3 => null,],
 				[1 => null, 2 => null, 3 => null],
 			],
@@ -80,7 +97,7 @@ class preview_test extends base
 				null,
 				[1 => [], 2 => [], 3 => []],
 				[1 => $post[2], 2 => $post[5], 3 => null],
-				[1 => $image[1], 2 => "$image[3] $image[4]", 3 => null],
+				[1 => [$image[1]], 2 => [$image[3], $image[4]], 3 => null],
 			],
 			[
 				// Check 1 topic, which contains 1 posted image
@@ -88,7 +105,7 @@ class preview_test extends base
 				null,
 				[1 => []],
 				[1 => $post[2]],
-				[1 => $image[1]],
+				[1 => [$image[1]]],
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, get up to 3 images from the newest post
@@ -96,7 +113,7 @@ class preview_test extends base
 				[2, 3],
 				[2 => [], 3 => []],
 				[2 => $post[5], 3 => null],
-				[2 => "$image[3] $image[4]", 3 => null],
+				[2 => [$image[3], $image[4]], 3 => null],
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, get only show 1 image from the newest post
@@ -104,7 +121,7 @@ class preview_test extends base
 				[2, 3],
 				[2 => [], 3 => []],
 				[2 => $post[5], 3 => null],
-				[2 => (string) $image[3], 3 => null],
+				[2 => [$image[3]], 3 => null],
 			],
 			[
 				// Check 2 topics, which has 2 posts with images, but only show 1 image from the oldest post
@@ -112,7 +129,7 @@ class preview_test extends base
 				[2, 3],
 				[2 => [], 3 => []],
 				[2 => $post[4], 3 => null],
-				[2 => (string) $image[2], 3 => null],
+				[2 => [$image[2]], 3 => null],
 			],
 		];
 	}
@@ -126,7 +143,7 @@ class preview_test extends base
 		{
 			if ($key === 'f_vse_tip')
 			{
-				$this->auth->expects($configs['user_vse_tip'] ? $this->atLeastOnce() : $this->never())
+				$this->auth->expects($configs['user_vse_tip'] ? self::atLeastOnce() : self::never())
 					->method('acl_get')
 					->with($key)
 					->willReturn($config);
@@ -142,6 +159,12 @@ class preview_test extends base
 			$this->config[$key] = $config;
 		}
 
+		// Add a forum_id to rowsets
+		foreach ($rowset as $id => $row)
+		{
+			$rowset[$id]['forum_id'] = 2;
+		}
+
 		$listener = $this->getEventListener();
 
 		// Test the update_row_data event
@@ -154,7 +177,10 @@ class preview_test extends base
 
 		foreach ($event_data['rowset'] as $topic_id => $topic_data)
 		{
-			$this->assertEquals($expected_row[$topic_id], $topic_data['post_text']);
+			if ($expected_row[$topic_id] !== null)
+			{
+				self::assertEquals($expected_row[$topic_id], $topic_data['post_text']);
+			}
 
 			// Test the update_tpl_data event
 			$row = $topic_data;
@@ -168,7 +194,10 @@ class preview_test extends base
 			$event_data = $event->get_data_filtered($event_data);
 			$topic_row = $event_data['topic_row'];
 
-			$this->assertEquals($expected_img[$topic_id], $topic_row['TOPIC_IMAGES']);
+			if ($expected_img[$topic_id] !== null)
+			{
+				self::assertEquals($expected_img[$topic_id], $topic_row['TOPIC_IMAGES']);
+			}
 		}
 	}
 
@@ -197,20 +226,20 @@ class preview_test extends base
 			$this->config[$key] = $value;
 		}
 
-		/** @var \PHPUnit_Framework_MockObject_MockObject|\vse\topicimagepreview\event\helper $factory */
-		$factory = $this->getMockBuilder('\vse\topicimagepreview\event\helper')
+		/** @var \PHPUnit_Framework_MockObject_MockObject|\vse\topicimagepreview\event\helper $helper */
+		$helper = $this->getMockBuilder('\vse\topicimagepreview\event\helper')
 			->disableOriginalConstructor()
 			->getMock();
 
-		$factory->expects($expected ? $this->once() : $this->never())
+		$helper->expects($expected ? self::once() : self::never())
 			->method('update_row_data');
 
-		$factory->expects($expected ? $this->atLeastOnce() : $this->never())
+		$helper->expects($expected ? self::atLeastOnce() : self::never())
 			->method('update_tpl_data');
 
 		$event = new \phpbb\event\data($data);
-		$listener = new \vse\topicimagepreview\event\preview($this->config, $factory);
-		$this->assertNull($listener->$method_row($event));
-		$this->assertNull($listener->$method_tpl($event));
+		$listener = new \vse\topicimagepreview\event\preview($this->config, $helper, $this->template);
+		self::assertNull($listener->$method_row($event));
+		self::assertNull($listener->$method_tpl($event));
 	}
 }

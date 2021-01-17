@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 - 2020-12-28
+
+- Fix SQL failures with MSSQL databases.
+- Align images to the top of the preview tooltip.
+- Only load CSS/JS files on pages where they are needed.
+- Move all HTML code out of PHP and into the template files.
+
 ## 1.0.0 - 2020-08-17
 
 - "F" it, ship it!
