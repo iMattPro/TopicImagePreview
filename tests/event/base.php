@@ -12,7 +12,7 @@ namespace vse\topicimagepreview\tests\event;
 
 class base extends \phpbb_database_test_case
 {
-	/** @var \PHPUnit_Framework_MockObject_MockObject|\phpbb\auth\auth */
+	/** @var \PHPUnit\Framework\MockObject\MockObject|\phpbb\auth\auth */
 	protected $auth;
 
 	/** @var \phpbb\config\config */
@@ -24,10 +24,10 @@ class base extends \phpbb_database_test_case
 	/** @var \phpbb\language\language */
 	protected $language;
 
-	/** @var \phpbb\request\request|\PHPUnit_Framework_MockObject_MockObject */
+	/** @var \phpbb\request\request|\PHPUnit\Framework\MockObject\MockObject */
 	protected $request;
 
-	/** @var \phpbb\template\template|\PHPUnit_Framework_MockObject_MockObject */
+	/** @var \phpbb\template\template|\PHPUnit\Framework\MockObject\MockObject */
 	protected $template;
 
 	/** @var \phpbb\user */
