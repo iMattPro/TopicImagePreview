@@ -50,8 +50,9 @@ class preview implements EventSubscriberInterface
 	/**
 	 * Constructor
 	 *
-	 * @param config $config
-	 * @param helper $helper
+	 * @param config   $config
+	 * @param helper   $helper
+	 * @param template $template
 	 */
 	public function __construct(config $config, helper $helper, template $template)
 	{
