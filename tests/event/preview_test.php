@@ -226,7 +226,7 @@ class preview_test extends base
 			$this->config[$key] = $value;
 		}
 
-		/** @var \PHPUnit_Framework_MockObject_MockObject|\vse\topicimagepreview\event\helper $helper */
+		/** @var \PHPUnit\Framework\MockObject\MockObject|\vse\topicimagepreview\event\helper $helper */
 		$helper = $this->getMockBuilder('\vse\topicimagepreview\event\helper')
 			->disableOriginalConstructor()
 			->getMock();
