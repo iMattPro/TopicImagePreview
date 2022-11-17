@@ -46,6 +46,11 @@ class settings_test extends base
 			  ['vars' => ['legend3' => []]],
 			  ['legend_vse_tip', 'vse_tip_new', 'vse_tip_num', 'vse_tip_dim', 'vse_tip_srt', 'legend3'],
 			],
+			[ // expected config and mode with PST support
+			  'post',
+			  ['vars' => ['legend3' => []]],
+			  ['legend_vse_tip', 'vse_tip_new', 'vse_tip_num', 'vse_tip_dim', 'vse_tip_srt', 'vse_tip_pst', 'legend3'],
+			],
 			[ // unexpected mode
 			  'foobar',
 			  ['vars' => ['legend3' => []]],
@@ -70,6 +75,11 @@ class settings_test extends base
 	public function test_update_acp_data($mode, $display_vars, $expected_keys)
 	{
 		require_once __DIR__ . '/../../../../../includes/functions_acp.php';
+
+		if (in_array('vse_tip_pst', $expected_keys))
+		{
+			$this->config['similar_topics'] = true;
+		}
 
 		$listener = $this->getEventListener();
 
@@ -306,5 +316,18 @@ class settings_test extends base
 		$listener->add_permission($event);
 
 		self::assertSame($event['permissions'], $expected);
+	}
+
+	public function test_select_vse_tip_new()
+	{
+		global $user;
+		$user = new \phpbb_mock_user;
+		$user->lang = new \phpbb_mock_lang();
+
+		require_once __DIR__ . '/../../../../../includes/functions_acp.php';
+
+		$listener = $this->getEventListener();
+
+		$this->assertStringContainsString('name="config[vse_tip_new]"', $listener->select_vse_tip_new(false));
 	}
 }
