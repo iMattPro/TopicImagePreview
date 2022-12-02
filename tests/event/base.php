@@ -55,17 +55,12 @@ class base extends \phpbb_database_test_case
 			'vse_tip_dim' => 200,
 		]);
 		$this->db = $this->new_dbal();
-		$this->auth = $this->getMockBuilder('\phpbb\auth\auth')
-			->disableOriginalConstructor()
-			->getMock();
+		$this->auth = $this->createMock('\phpbb\auth\auth');
 		$this->language = new \phpbb\language\language(
 			new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx)
 		);
-		$this->request = $this->getMockBuilder('\phpbb\request\request')
-			->disableOriginalConstructor()
-			->getMock();
-		$this->template = $this->getMockBuilder('\phpbb\template\template')
-			->getMock();
+		$this->request = $this->createMock('\phpbb\request\request');
+		$this->template = $this->createMock('\phpbb\template\template');
 		$this->user = new \phpbb\user($this->language, '\phpbb\datetime');
 		$this->user->data['user_vse_tip'] = 1;
 	}

@@ -227,9 +227,7 @@ class preview_test extends base
 		}
 
 		/** @var \PHPUnit\Framework\MockObject\MockObject|\vse\topicimagepreview\event\helper $helper */
-		$helper = $this->getMockBuilder('\vse\topicimagepreview\event\helper')
-			->disableOriginalConstructor()
-			->getMock();
+		$helper = $this->createMock('\vse\topicimagepreview\event\helper');
 
 		$helper->expects($expected ? self::once() : self::never())
 			->method('update_row_data');
