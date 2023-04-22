@@ -3,10 +3,11 @@
 		{% INCLUDEJS '@vse_topicimagepreview/js/opentip-jquery.min.js' %}
 		{% DEFINE INCLUDED_OPENTIPJS = true %}
 	{% endif %}
-
 	<script>
-		$(function() {
-			$("[data-ot]").closest("dt").removeAttr("title");
+		document.addEventListener('DOMContentLoaded', () => {
+			document.querySelectorAll('[data-ot]').forEach(elem => {
+				elem.closest('dt').removeAttribute('title');
+			})
 		});
 	</script>
 {% endif %}

@@ -26,7 +26,7 @@ $lang = array_merge($lang, [
 // Overwrite core error message keys with a more specific message.
 $lang = array_merge($lang, [
 	'EXTENSION_NOT_ENABLEABLE'		=> isset($lang['EXTENSION_NOT_ENABLEABLE']) ?
-		$lang['EXTENSION_NOT_ENABLEABLE'] . '<br />' . sprintf($lang['TIP_INSTALL_ERROR'], \vse\topicimagepreview\ext::PHPBB_MIN_VERSION) :
+		$lang['EXTENSION_NOT_ENABLEABLE'] . '<br>' . sprintf($lang['TIP_INSTALL_ERROR'], \vse\topicimagepreview\ext::PHPBB_MIN_VERSION) :
 		null,
 	'CLI_EXTENSION_ENABLE_FAILURE'	=> isset($lang['CLI_EXTENSION_ENABLE_FAILURE']) ?
 		$lang['CLI_EXTENSION_ENABLE_FAILURE'] . '. ' . sprintf($lang['TIP_INSTALL_ERROR'], \vse\topicimagepreview\ext::PHPBB_MIN_VERSION) :
