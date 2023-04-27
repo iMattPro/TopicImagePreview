@@ -132,9 +132,9 @@ class helper
 
 			$stmt = '(SELECT ' . ($is_mssql ? 'TOP 1 ' : '') . 'topic_id, post_text
 				FROM ' . POSTS_TABLE . '
-				WHERE topic_id = ' . (int) $topic_id . '
+				WHERE post_text ' . $like_expression . '
 					AND post_visibility = ' . ITEM_APPROVED . '
-					AND post_text ' . $like_expression . '
+					AND topic_id = ' . (int) $topic_id . '
 				ORDER BY post_time ' . $direction . ($is_mssql ? '' : ' LIMIT 1') . ')';
 
 			// SQLite3 and mssql don't like ORDER BY with UNION ALL, so treat $stmt as derived table
