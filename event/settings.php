@@ -100,7 +100,7 @@ class settings implements EventSubscriberInterface
 
 			$my_config_vars = [
 				'legend_vse_tip'	=> 'ACP_TIP_TITLE',
-				'vse_tip_new'		=> ['lang' => 'ACP_TIP_DISPLAY_AGE', 'validate' => 'bool', 'type' => 'custom', 'function' => [$this, 'select_vse_tip_new'], 'explain' => true],
+				'vse_tip_new'		=> ['lang' => 'ACP_TIP_DISPLAY_AGE', 'validate' => 'bool', 'type' => 'radio', 'function' => 'phpbb_build_radio', 'params' => ['{CONFIG_VALUE}', '{KEY}', [1 => 'ACP_TIP_NEWEST_POST', 0 => 'ACP_TIP_OLDEST_POST']], 'explain' => true],
 				'vse_tip_num'		=> ['lang' => 'ACP_TIP_DISPLAY_NUM', 'validate' => 'int:0:99', 'type' => 'number:0:99', 'explain' => true],
 				'vse_tip_dim'		=> ['lang' => 'ACP_TIP_DISPLAY_DIM', 'validate' => 'int:0:999', 'type' => 'number:0:999', 'explain' => true, 'append' => ' ' . $this->language->lang('PIXEL')],
 				'vse_tip_srt'		=> ['lang' => 'ACP_TIP_DISPLAY_SRT', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false],
@@ -114,21 +114,6 @@ class settings implements EventSubscriberInterface
 
 			$event->update_subarray('display_vars', 'vars', phpbb_insert_config_array($event['display_vars']['vars'], $my_config_vars, ['before' => 'legend3']));
 		}
-	}
-
-	/**
-	 * Create custom radio buttons.
-	 *
-	 * @param mixed  $value
-	 * @param string $key
-	 *
-	 * @return string
-	 */
-	public function select_vse_tip_new($value, $key = '')
-	{
-		$radio_ary = [1 => 'ACP_TIP_NEWEST_POST', 0 => 'ACP_TIP_OLDEST_POST'];
-
-		return h_radio('config[vse_tip_new]', $radio_ary, $value, $key);
 	}
 
 	/**
