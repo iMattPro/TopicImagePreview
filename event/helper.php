@@ -118,44 +118,56 @@ class helper
 	 */
 	protected function query_images(array $topic_list, array $rowset)
 	{
-		$sql_array = [];
 		$direction = $this->config->offsetGet('vse_tip_new') ? 'DESC' : 'ASC';
 		$like_expression = $this->db->sql_like_expression('<r>' . $this->db->get_any_char() . '<IMG ' . $this->db->get_any_char());
-		$is_sqlite3 = $this->db->get_sql_layer() === 'sqlite3';
-		$is_mssql = strpos($this->db->get_sql_layer(), 'mssql') === 0;
-		foreach ($topic_list as $topic_id)
-		{
-			if (!$this->forum_allowed($rowset[$topic_id]['forum_id']))
-			{
-				continue;
-			}
+		$sql_layer = $this->db->get_sql_layer();
+		$is_sqlite3 = $sql_layer === 'sqlite3';
+		$is_mssql = strpos($sql_layer, 'mssql') === 0;
 
-			$stmt = '(SELECT ' . ($is_mssql ? 'TOP 1 ' : '') . 'topic_id, post_text
-				FROM ' . POSTS_TABLE . '
-				WHERE post_text ' . $like_expression . '
-					AND post_visibility = ' . ITEM_APPROVED . '
-					AND topic_id = ' . (int) $topic_id . '
-				ORDER BY post_time ' . $direction . ($is_mssql ? '' : ' LIMIT 1') . ')';
+		$valid_topics = array_filter($topic_list, function ($topic_id) use ($rowset) {
+			return isset($rowset[$topic_id]) && $this->forum_allowed($rowset[$topic_id]['forum_id']);
+		});
 
-			// SQLite3 and mssql don't like ORDER BY with UNION ALL, so treat $stmt as derived table
-			if ($is_sqlite3 || $is_mssql)
-			{
-				$stmt = "SELECT * FROM $stmt AS d";
-			}
-
-			$sql_array[] = $stmt;
+		if (empty($valid_topics)) {
+			return $rowset;
 		}
 
-		if (count($sql_array))
-		{
+		if (!$is_sqlite3 && !$is_mssql) {
+			// Optimized version using ROW_NUMBER() so it can scale better then lot of unions
+			$topic_ids_sql = implode(',', array_map('intval', $valid_topics));
+
+			$sql = "
+				SELECT topic_id, post_text FROM (
+					SELECT topic_id, post_text,
+						   ROW_NUMBER() OVER (PARTITION BY topic_id ORDER BY post_time $direction) as rn
+					FROM " . POSTS_TABLE . "
+					WHERE topic_id IN ($topic_ids_sql)
+					  AND post_text " . $like_expression . "
+				) t
+				WHERE rn = 1
+			";
+		} else {
+			// Fallback for SQLite/MSSQL (UNION ALL method)
+			$sql_array = [];
+
+			foreach ($valid_topics as $topic_id) {
+				$stmt = '(SELECT ' . ($is_mssql ? 'TOP 1 ' : '') . 'topic_id, post_text
+					FROM ' . POSTS_TABLE . '
+					WHERE topic_id = ' . (int) $topic_id . '
+						AND post_text ' . $like_expression . '
+					ORDER BY post_time ' . $direction . ($is_mssql ? '' : ' LIMIT 1') . ')';
+
+				$sql_array[] = ($is_sqlite3 || $is_mssql) ? "SELECT * FROM $stmt AS d" : $stmt;
+			}
+
 			$sql = implode(' UNION ALL ', $sql_array);
-			$result = $this->db->sql_query($sql);
-			while ($row = $this->db->sql_fetchrow($result))
-			{
-				$rowset[$row['topic_id']]['post_text'] = $row['post_text'];
-			}
-			$this->db->sql_freeresult($result);
 		}
+
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result)) {
+			$rowset[$row['topic_id']]['post_text'] = $row['post_text'];
+		}
+		$this->db->sql_freeresult($result);
 
 		return $rowset;
 	}
