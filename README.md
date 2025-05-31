@@ -4,7 +4,6 @@ A phpBB extension. Display thumbnail previews of images in a topic when hovering
 
 [![Build Status](https://github.com/iMattPro/TopicImagePreview/actions/workflows/tests.yml/badge.svg)](https://github.com/iMattPro/TopicImagePreview/actions)
 [![codecov](https://codecov.io/gh/iMattPro/TopicImagePreview/branch/master/graph/badge.svg?token=ZBKR5KMZGE)](https://codecov.io/gh/iMattPro/TopicImagePreview)
-[![Maintainability](https://qlty.sh/badges/0146fbe6-ae9d-4cea-bf88-dcc0f90bf774/maintainability.svg)](https://qlty.sh/gh/iMattPro/projects/TopicImagePreview)
 [![Latest Stable Version](https://poser.pugx.org/vse/topicimagepreview/v/stable)](https://www.phpbb.com/customise/db/extension/topic_image_preview/)
 
 ## License
