@@ -16,7 +16,6 @@ class ext extends \phpbb\extension\base
 	 * The minimum phpBB version required by this extension
 	 */
 	const PHPBB_MIN_VERSION = '3.2.1';
-	const PHPBB_MAX_VERSION = '4.0.0-dev';
 
 	/**
 	 * {@inheritdoc}
@@ -24,8 +23,7 @@ class ext extends \phpbb\extension\base
 	public function is_enableable()
 	{
 		// Require minimum phpBB version.
-		$is_enableable = phpbb_version_compare(PHPBB_VERSION, self::PHPBB_MIN_VERSION, '>=')
-			&& phpbb_version_compare(PHPBB_VERSION, self::PHPBB_MAX_VERSION, '<');
+		$is_enableable = phpbb_version_compare(PHPBB_VERSION, self::PHPBB_MIN_VERSION, '>=');
 
 		// If not enableable, add our custom install error language keys
 		if (!$is_enableable)
