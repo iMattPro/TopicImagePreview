@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 - 2025-06-05
+
+- Modernized codebase and ensure compatibility between phpBB 3.2, 3.3 and 4.0.
+
 ## 1.0.1 - 2020-12-28
 
 - Fix SQL failures with MSSQL databases.
@@ -48,7 +52,7 @@
 
 ### 1.0.0-a5 - 2017-02-17
 
-- Massively improve database performance, up to 18x faster.
+- Massively improves database performance, up to 18x faster.
 
 ### 1.0.0-a4 - 2017-02-15
 
