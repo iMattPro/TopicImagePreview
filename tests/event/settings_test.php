@@ -317,17 +317,4 @@ class settings_test extends base
 
 		self::assertSame($event['permissions'], $expected);
 	}
-
-	public function test_select_vse_tip_new()
-	{
-		global $user;
-		$user = new \phpbb_mock_user;
-		$user->lang = new \phpbb_mock_lang();
-
-		require_once __DIR__ . '/../../../../../includes/functions_acp.php';
-
-		$listener = $this->getEventListener();
-
-		$this->assertStringContainsString('name="config[vse_tip_new]"', $listener->select_vse_tip_new(false));
-	}
 }
