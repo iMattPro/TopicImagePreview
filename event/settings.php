@@ -156,7 +156,7 @@ class settings implements EventSubscriberInterface
 	}
 
 	/**
-	 * Get user's Topic Image Preview option and display it in UCP Preferences page
+	 * Get a user's Topic Image Preview option and display it in UCP Preferences page
 	 *
 	 * @param \phpbb\event\data $event The event object
 	 *
@@ -171,7 +171,7 @@ class settings implements EventSubscriberInterface
 			$this->request->variable('user_vse_tip', (int) $this->user->data['user_vse_tip'])
 		);
 
-		// Output the data vars to the template (except on form submit)
+		// Output the data vars to the template (except on form submitted)
 		if (!$event['submit'])
 		{
 			$this->language->add_lang('tip_ucp', 'vse/topicimagepreview');
@@ -183,7 +183,7 @@ class settings implements EventSubscriberInterface
 	}
 
 	/**
-	 * Add user's Topic Image Preview option state into UCP sql_array
+	 * Add a user's Topic Image Preview option state into UCP sql_array
 	 *
 	 * @param \phpbb\event\data $event The event object
 	 *
