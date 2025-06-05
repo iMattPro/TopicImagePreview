@@ -94,26 +94,65 @@ class settings implements EventSubscriberInterface
 	 */
 	public function update_acp_data($event)
 	{
-		if ($event['mode'] === 'post' && array_key_exists('legend3', $event['display_vars']['vars']))
+		if ($event['mode'] !== 'post' || !array_key_exists('legend3', $event['display_vars']['vars']))
 		{
-			$this->language->add_lang('tip_acp', 'vse/topicimagepreview');
-
-			$my_config_vars = [
-				'legend_vse_tip'	=> 'ACP_TIP_TITLE',
-				'vse_tip_new'		=> ['lang' => 'ACP_TIP_DISPLAY_AGE', 'validate' => 'bool', 'type' => 'radio', 'function' => 'phpbb_build_radio', 'params' => ['{CONFIG_VALUE}', '{KEY}', [1 => 'ACP_TIP_NEWEST_POST', 0 => 'ACP_TIP_OLDEST_POST']], 'explain' => true],
-				'vse_tip_num'		=> ['lang' => 'ACP_TIP_DISPLAY_NUM', 'validate' => 'int:0:99', 'type' => 'number:0:99', 'explain' => true],
-				'vse_tip_dim'		=> ['lang' => 'ACP_TIP_DISPLAY_DIM', 'validate' => 'int:0:999', 'type' => 'number:0:999', 'explain' => true, 'append' => ' ' . $this->language->lang('PIXEL')],
-				'vse_tip_srt'		=> ['lang' => 'ACP_TIP_DISPLAY_SRT', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false],
-			];
-
-			// Add an option to display in Precise Similar Topics if it is installed
-			if ($this->config->offsetExists('similar_topics'))
-			{
-				$my_config_vars['vse_tip_pst'] = ['lang' => 'ACP_TIP_DISPLAY_PST', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => false];
-			}
-
-			$event->update_subarray('display_vars', 'vars', phpbb_insert_config_array($event['display_vars']['vars'], $my_config_vars, ['before' => 'legend3']));
+			return;
 		}
+
+		$this->language->add_lang('tip_acp', 'vse/topicimagepreview');
+
+		// check for phpBB4 since h_radio() was replaced with phpbb_build_radio()
+		$is_phpbb4 = strpos(PHPBB_VERSION, '4') === 0;
+
+		$my_config_vars = [
+			'legend_vse_tip' => 'ACP_TIP_TITLE',
+			'vse_tip_new'  => [
+				'lang'     => 'ACP_TIP_DISPLAY_AGE',
+				'validate' => 'bool',
+				'type'     => $is_phpbb4 ? 'radio' : 'custom',
+				'function' => $is_phpbb4 ? 'phpbb_build_radio' : 'h_radio',
+				'params'   => $is_phpbb4
+					? ['{CONFIG_VALUE}', '{KEY}', [1 => 'ACP_TIP_NEWEST_POST', 0 => 'ACP_TIP_OLDEST_POST']]
+					: ['config[vse_tip_new]', [1 => 'ACP_TIP_NEWEST_POST', 0 => 'ACP_TIP_OLDEST_POST'], '{CONFIG_VALUE}', '{KEY}'],
+				'explain'  => true
+			],
+			'vse_tip_num' => [
+				'lang'     => 'ACP_TIP_DISPLAY_NUM',
+				'validate' => 'int:0:99',
+				'type'     => 'number:0:99',
+				'explain'  => true
+			],
+			'vse_tip_dim' => [
+				'lang'     => 'ACP_TIP_DISPLAY_DIM',
+				'validate' => 'int:0:999',
+				'type'     => 'number:0:999',
+				'explain'  => true,
+				'append'   => ' ' . $this->language->lang('PIXEL')
+			],
+			'vse_tip_srt' => [
+				'lang'     => 'ACP_TIP_DISPLAY_SRT',
+				'validate' => 'bool',
+				'type'     => 'radio:yes_no',
+				'explain'  => false
+			],
+		];
+
+		// Add an option to display in Precise Similar Topics if it is installed
+		if ($this->config->offsetExists('similar_topics'))
+		{
+			$my_config_vars['vse_tip_pst'] = [
+				'lang' => 'ACP_TIP_DISPLAY_PST',
+				'validate' => 'bool',
+				'type' => 'radio:yes_no',
+				'explain' => false
+			];
+		}
+
+		$event->update_subarray(
+			'display_vars',
+			'vars',
+			phpbb_insert_config_array($event['display_vars']['vars'], $my_config_vars, ['before' => 'legend3'])
+		);
 	}
 
 	/**
