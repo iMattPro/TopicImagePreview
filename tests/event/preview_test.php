@@ -58,7 +58,7 @@ class preview_test extends base
 		$listener->init_tpl_vars();
 	}
 
-	public function preview_factory_test_data()
+	public static function preview_factory_test_data()
 	{
 
 		$image = [
@@ -201,7 +201,7 @@ class preview_test extends base
 		}
 	}
 
-	public function preview_events_data()
+	public static function preview_events_data()
 	{
 		return [
 			['viewforum', [], [], true],

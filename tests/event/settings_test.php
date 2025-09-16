@@ -38,7 +38,7 @@ class settings_test extends base
 		], array_keys(\vse\topicimagepreview\event\settings::getSubscribedEvents()));
 	}
 
-	public function update_acp_data_data()
+	public static function update_acp_data_data()
 	{
 		return [
 			[ // expected config and mode
@@ -100,7 +100,7 @@ class settings_test extends base
 		self::assertEquals($expected_keys, $keys);
 	}
 
-	public function update_ucp_data_data()
+	public static function update_ucp_data_data()
 	{
 		return [
 			[
@@ -148,7 +148,7 @@ class settings_test extends base
 		self::assertEquals($expected, $event_data_after['sql_ary']);
 	}
 
-	public function handle_ucp_data_data()
+	public static function handle_ucp_data_data()
 	{
 		return [
 			[
@@ -281,7 +281,7 @@ class settings_test extends base
 		self::assertEquals($expected, $result['data']);
 	}
 
-	public function add_permissions_test_data()
+	public static function add_permissions_test_data()
 	{
 		return [
 			[
