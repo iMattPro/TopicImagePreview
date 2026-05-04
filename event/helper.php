@@ -62,7 +62,7 @@ class helper
 	}
 
 	/**
-	 * Add post text containing images to topic row data.
+	 * Add post-text containing images to topic row data.
 	 *
 	 * @param \phpbb\event\data $event The event object
 	 *
@@ -106,7 +106,7 @@ class helper
 	}
 
 	/**
-	 * Run an SQL query on a group of topics, and find the newest (or oldest)
+	 * Run an SQL query on a group of topics and find the newest (or oldest)
 	 * post with [IMG] images. Then update the topic's row set array to include
 	 * the post's text in the cases where images were found.
 	 *
@@ -183,7 +183,7 @@ class helper
 	}
 
 	/**
-	 * Is the forum allowed to show topic image previews
+	 * Is the forum allowed to show topic image previews?
 	 *
 	 * @param int $forum_id Forum identifier
 	 * @return bool True if allowed, false if not

@@ -25,7 +25,7 @@ class ext extends \phpbb\extension\base
 		// Require minimum phpBB version.
 		$is_enableable = phpbb_version_compare(PHPBB_VERSION, self::PHPBB_MIN_VERSION, '>=');
 
-		// If not enableable, add our custom install error language keys
+		// If not enableable, add our custom installation error language keys
 		if (!$is_enableable)
 		{
 			$lang = $this->container->get('language');
