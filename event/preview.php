@@ -93,7 +93,7 @@ class preview implements EventSubscriberInterface
 	}
 
 	/**
-	 * Update search results topics row
+	 * Update search results topic row
 	 *
 	 * @param \phpbb\event\data $event The event object
 	 */

@@ -93,7 +93,7 @@ class settings_test extends base
 		{
 			self::assertArrayHasKey($expected, $event_data_after);
 		}
-		extract($event_data_after, EXTR_OVERWRITE);
+		extract($event_data_after);
 
 		$keys = array_keys($display_vars['vars']);
 
